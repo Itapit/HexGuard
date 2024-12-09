@@ -1,0 +1,80 @@
+operations modes:
+    ECB
+    CBC
+    opt:
+    CBF
+    OFB
+    CTR
+    
+
+data structures:
+    matrix (2d arr) - s_box,inv_s_box,  state
+    clebsch graph - subkeys
+
+dll main functions:
+
+    create_key
+    create_iv
+    select_mod // i want to have it in like a buttons setup in the ui with a quick explanation about each one
+
+    encrypt_file(file_path, key, opt: IV)
+    encrypt_text(string, key, opt: IV)
+    
+    decrypt_file(file_path, key, opt: IV)
+    decrypt_text(string, key, opt: IV)
+
+internal functions:
+
+    string_to_state //2d array
+    state_to_string
+
+    AddRoundKey
+    SubBytes
+    ShiftRow
+    MixColumns
+    KeyExpansion
+
+    inverted:
+
+    InvShiftRows
+    InvSubBytes
+    InvMixColumns
+
+
+encrypt():
+    state <- in
+    state <- AddRoundKey()
+    for round from 1 to Nr - 1 do
+        state <- SubBytes(state)
+        state <- ShiftRow(state)
+        state <- MixColumns(state)
+        state <- AddRoundKey(....)
+    end for
+    state <- SubBytes(state)
+    state <- ShiftRow(state)
+    state <- AddRoundKey(...)
+    return state
+end encrypt
+
+
+encrypt_file():
+    note, PADDING
+
+    create new binary file that will contain the encrypted cipher
+    open the given file
+    for each block size in file:
+        encrypt(block)
+        add the encrypted block to the new file
+    ret file_path
+
+
+encrypt_text():
+    note, PADDING
+    note, there is a limit of 509 chars in string approximately
+
+    opt 1:
+        create a list from the string with each one having a block size as the data
+    opt 2:
+        call the encrypt function with the start and end index of block size in the string
+        and add the encrypted block size to the new string
+        ret new_string
