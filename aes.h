@@ -36,13 +36,12 @@ void InvShiftRows(state_t state);
 void InvMixColumns(state_t state);
 
 // Utilities
-void string_to_state(const char *input, state_t state);
-void state_to_string(const state_t state, char *output);
+void stringToState(const char *input, state_t state);
+void stateToString(const state_t state, char *output);
 
 // Encryption/Decryption Core
 void aes_encrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);
 void aes_decrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);
-
 
 
 #endif 

@@ -9,7 +9,7 @@ operations modes:
 
 data structures:
     matrix (2d arr) - s_box,inv_s_box,  state
-    clebsch graph - subkeys
+    clebsch graph - subKeys
 
 dll main functions:
 
