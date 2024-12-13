@@ -13,22 +13,30 @@ typedef uint8_t state_t[4][4];
 
 // Public Functions (DLL Main Functions)
 void create_key(uint8_t *key, size_t key_size);
-void create_iv(uint8_t *key, size_t iv_size);
+void create_iv(uint8_t *key);
 
-void select_mode(const char *mode_name); // Accepts "ECB", "CBC", "CFB", "OFB", or "CTR"
+void select_mode(const char *mode_name);
 
-void encrypt_file(const char *file_path, const uint8_t *key, const uint8_t *iv);
-void encrypt_text(const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);
+// void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key);  // accepts "ECB" CTR
+// void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
 
-void decrypt_file(const char *file_path, const uint8_t *key, const uint8_t *iv);
-void decrypt_text(const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);
+// void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key);  // accepts "ECB" CTR
+// void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);  //Accepts CBC CFB OFB PCBC
+
+
+// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key); // accepts "ECB" CTR
+// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
+
+// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key); // accepts "ECB" CTR
+// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
 
 // Internal AES Core Functions
 void AddRoundKey(state_t state, const uint8_t *round_key);
 void SubBytes(state_t state);
 void ShiftRows(state_t state);
 void MixColumns(state_t state);
-void KeyExpansion(const uint8_t *key, uint8_t *expanded_keys, size_t key_size);
+void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size);
+void RotWord(uint8_t *word);
 
 // Inverse Operations
 void InvSubBytes(state_t state);
