@@ -6,6 +6,7 @@
 #include "aes.h"
 #define state_row_len 4
 #define state_col_len 4
+#define Nb 4  //pretty sure the Nb represent the number of cols in the state
 
 #define AES_BLOCK_SIZE 16  // Block size in bytes
 #define AES_KEY_SIZE_128 16 // Key size in bytes for AES-128
@@ -66,14 +67,14 @@ void AddRoundKey(state_t state, const uint8_t *round_key) {
     }
 }
 void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size) {
-    int nK = key_size / 32;   //number of 32-bit words in the key
-    int nR; //number of rounds
-    if(nK == 4){
-        nR = 10;}
-    else if (nK == 6){
-        nR = 12;}
-    else if (nK == 8){
-        nR = 10;}
+    int Nk = key_size / 32;   //number of 32-bit words in the key
+    int Nr; //number of rounds
+    if(Nk == 4){
+        Nr = 10;}
+    else if (Nk == 6){
+        Nr = 12;}
+    else if (Nk == 8){
+        Nr = 10;}
     else{
         printf("Invalid key size. Supported sizes are 128, 192, and 256 bits.\n");
         return;
