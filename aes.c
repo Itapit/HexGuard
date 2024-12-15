@@ -66,8 +66,64 @@ void AddRoundKey(state_t state, const uint8_t *round_key) {
         }
     }
 }
+void SubBytes(state_t state)
+{
+    for (int row = 0; row < state_row_len; row++) {
+        for (int col = 0; col < state_col_len; col++) {
+            state[row][col] = sbox[state[row][col]];   
+        }
+    }
+}
+void ShiftRows(state_t state) {
+    for (int row = 1; row < state_row_len; row++) {
+        for (int shift = 0; shift < row; shift++) { 
+            uint8_t temp = state[row][0];
+            state[row][0] = state[row][1];
+            state[row][1] = state[row][2];
+            state[row][2] = state[row][3];
+            state[row][3] = temp;
+        }
+    }
+}
+uint8_t mul_word_Galois_field(uint8_t a, uint8_t b) {
+    /*
+    Performs multiplication in the finite field GF(2^8) using the
+    AES irreducible polynomial x^8 + x^4 + x^3 + x + 1 (0x1B).
+    
+    The function implements finite field multiplication by iteratively
+    checking each bit of the multiplier `b`. If a bit in `b` is set (1),
+    the corresponding value of `a` (shifted appropriately) is XORed 
+    into the result `p`. The polynomial is reduced modulo the AES 
+    irreducible polynomial when necessary to ensure the result stays 
+    within GF(2^8). 
+
+    Steps:
+    1. Initialize the product `p` to 0.
+    2. Repeat the following for 8 iterations (one for each bit of `b`):
+       a. If the least significant bit (LSB) of `b` is 1, XOR `p` with `a`.
+       b. Check if the most significant bit (MSB) of `a` is set before shifting.
+       c. Shift `a` left by one bit. If the MSB was set, XOR `a` with 0x1B 
+          to perform modular reduction.
+       d. Shift `b` right by one bit to process the next bit.
+    3. Return the final value of `p`, which is the product in GF(2^8).
+    */
+    uint8_t p = 0;
+    for (int i = 0; i < 8; i++) {
+        if (b & 1)  //LSB of b is set aka LSB equal 1
+            p ^= a;
+        
+        uint8_t hi_bit_set = (a & 0x80);  //MSB of a
+        a <<= 1;
+        
+        if (hi_bit_set)
+            a ^= 0x1B;   // x^8 + x^4 + x^3 + x + 1
+        
+        b >>= 1;
+    }
+    return p;
+}
 void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size) {
-    int Nk = key_size / 32;   //number of 32-bit words in the key
+    int Nk = key_size / 32;   //number of words in the key
     int Nr; //number of rounds
     if(Nk == 4){
         Nr = 10;}
@@ -123,17 +179,17 @@ void stringToState(const char *input, state_t state){
     if (strlen(input) != AES_BLOCK_SIZE) {
         return;
     }
-    for (int i = 0; i < state_row_len; i++) {
-        for (int ii = 0; ii < state_col_len; ii++) {
-            state[i][ii] = input[i * state_row_len + ii];
+    for (int row = 0; row < state_row_len; row++) {
+        for (int col = 0; col < state_col_len; col++) {
+            state[row][col] = input[row * state_row_len + col];
         }
     }  
 }
 
 void stateToString(const state_t state, char *output){
-    for (int i = 0; i < state_row_len; i++){
-        for (int ii = 0; ii < state_col_len; ii++){
-            output[i * 4 + ii] = state[i][ii];   
+    for (int row = 0; row < state_row_len; row++){
+        for (int col = 0; col < state_col_len; col++){
+            output[row * 4 + col] = state[row][col];   
         }
     }
     output[AES_BLOCK_SIZE] = '\0';

@@ -8,27 +8,21 @@
 #define AES_KEY_SIZE_128 16 // Key size in bytes for AES-128
 #define AES_KEY_SIZE_192 24 // Key size in bytes for AES-192
 #define AES_KEY_SIZE_256 32 // Key size in bytes for AES-256
+#define state_row_len 4
+#define state_col_len 4
 
-typedef uint8_t state_t[4][4];
+typedef uint8_t state_t[state_row_len][state_col_len];
 
 // Public Functions (DLL Main Functions)
 void create_key(uint8_t *key, size_t key_size);
 void create_iv(uint8_t *key);
 
-void select_mode(const char *mode_name);
 
-// void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key);  // accepts "ECB" CTR
-// void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
+// void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  without iv: ECB CTR
+// void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);  //Accepts CBC CFB OFB PCBC  without iv: ECB CTR
 
-// void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key);  // accepts "ECB" CTR
-// void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);  //Accepts CBC CFB OFB PCBC
-
-
-// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key); // accepts "ECB" CTR
-// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
-
-// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key); // accepts "ECB" CTR
-// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC
+// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
+// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 
 // Internal AES Core Functions
 void AddRoundKey(state_t state, const uint8_t *round_key);
@@ -37,6 +31,7 @@ void ShiftRows(state_t state);
 void MixColumns(state_t state);
 void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size);
 void RotWord(uint8_t *word);
+void SubWord(uint8_t *word);
 
 // Inverse Operations
 void InvSubBytes(state_t state);
@@ -46,6 +41,7 @@ void InvMixColumns(state_t state);
 // Utilities
 void stringToState(const char *input, state_t state);
 void stateToString(const state_t state, char *output);
+uint8_t mul_word_finite_field(uint8_t a, uint8_t b);
 
 // Encryption/Decryption Core
 void aes_encrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);

@@ -42,55 +42,50 @@ typedef int bool;
         } \
     } while (0)
 
-    int test_create_key()
-    {
-        key_128 key_test_128 = {0}, key2 = {0}, key3 = {0};
-        key_192 key_test_192 = {0};
-        key_256 key_test_256 = {0};
+int test_create_key() {
+    key_128 key_test_128 = {0}, key2 = {0}, key3 = {0};
+    key_192 key_test_192 = {0};
+    key_256 key_test_256 = {0};
+    key_256 key_test_empty = {0};
 
-        key_256 key_test_empty = {0};
+    create_key(key_test_128, 128);
+    create_key(key_test_192, 192);
+    create_key(key_test_256, 256);
+    create_key(key2, 128);
+    create_key(key3, 128);
 
-        create_key(key_test_128, 128);
-        create_key(key_test_192, 192);
-        create_key(key_test_256, 256);
+    // printf("key_test_128:\n");
+    // for (int i = 0; i < AES_KEY_SIZE_128; i++)
+    // {
+    //     printf("%02X", key_test_128[i]);
+    // }
+    // printf("\n");
+    // printf("key_test_192:\n");
+    // for (int i = 0; i < AES_KEY_SIZE_192; i++)
+    // {
+    //     printf("%02X", key_test_192[i]);
+    // }
+    // printf("\n");
+    // printf("key_test_256:\n");
+    // for (int i = 0; i < AES_KEY_SIZE_256; i++)
+    // {
+    //     printf("%02X", key_test_256[i]);
+    // }
+    // printf("\n");
 
-        create_key(key2, 128);
-        create_key(key3, 128);
+    // check if the keys are empty
+    ASSERT(memcmp(key_test_128, key_test_empty, AES_KEY_SIZE_128) == 1, "Key 128 is all zeros");
+    ASSERT(memcmp(key_test_192, key_test_empty, AES_KEY_SIZE_192) == 1, "Key 192 is all zeros");
+    ASSERT(memcmp(key_test_256, key_test_empty, AES_KEY_SIZE_256) == 1, "Key 256 is all zeros");
 
-        // printf("key_test_128:\n");
-        // for (int i = 0; i < AES_KEY_SIZE_128; i++)
-        // {
-        //     printf("%02X", key_test_128[i]);
-        // }
-        // printf("\n");
+    // check if the keys are identical
+    ASSERT(memcmp(key_test_128, key2, AES_KEY_SIZE_128) != 0, "Key1 and Key2 are identical");
+    ASSERT(memcmp(key2, key3, AES_KEY_SIZE_128) != 0, "Key2 and Key3 are identical");
+    ASSERT(memcmp(key_test_128, key3, AES_KEY_SIZE_128) != 0, "Key1 and Key3 are identical");
 
-        // printf("key_test_192:\n");
-        // for (int i = 0; i < AES_KEY_SIZE_192; i++)
-        // {
-        //     printf("%02X", key_test_192[i]);
-        // }
-        // printf("\n");
-
-        // printf("key_test_256:\n");
-        // for (int i = 0; i < AES_KEY_SIZE_256; i++)
-        // {
-        //     printf("%02X", key_test_256[i]);
-        // }
-        // printf("\n");
-
-        // check if the keys are empty
-        ASSERT(memcmp(key_test_128, key_test_empty, AES_KEY_SIZE_128) == 1, "Key 128 is all zeros");
-        ASSERT(memcmp(key_test_192, key_test_empty, AES_KEY_SIZE_192) == 1, "Key 192 is all zeros");
-        ASSERT(memcmp(key_test_256, key_test_empty, AES_KEY_SIZE_256) == 1, "Key 256 is all zeros");
-        // check if the keys are identical
-
-        ASSERT(memcmp(key_test_128, key2, AES_KEY_SIZE_128) != 0, "Key1 and Key2 are identical");
-        ASSERT(memcmp(key2, key3, AES_KEY_SIZE_128) != 0, "Key2 and Key3 are identical");
-        ASSERT(memcmp(key_test_128, key3, AES_KEY_SIZE_128) != 0, "Key1 and Key3 are identical");
-        return true;
-    }
-int test_stringToState()
-{
+    return true;
+}
+int test_stringToState() {
     //input string
     char input[] = "abcdefghijklmnop";
     //state after function
@@ -127,8 +122,7 @@ int test_stringToState()
 
     return true;
 }
-int test_stateToString()
-{
+int test_stateToString() {
     state_t state = {
         {0x61, 0x62, 0x63, 0x64}, // 'a', 'b', 'c', 'd'
         {0x65, 0x66, 0x67, 0x68}, // 'e', 'f', 'g', 'h'
@@ -183,6 +177,54 @@ int test_AddRoundKey() {
     ASSERT(memcmp(state, expected_state, sizeof(state)) == 0, "AddRoundKey failed.");
     return true;
 }
+int test_SubBytes() {
+    state_t state = {
+    {0x19, 0xa0, 0x9a, 0xe9},
+    {0x3d, 0xf4, 0xc6, 0xf8},
+    {0xe3, 0xe2, 0x8d, 0x48},
+    {0xbe, 0x2b, 0x2a, 0x08}
+    };
+
+    state_t expected_state = {
+    {0xd4, 0xe0, 0xb8, 0x1e},
+    {0x27, 0xbf, 0xb4, 0x41},
+    {0x11, 0x98, 0x5d, 0x52},
+    {0xae, 0xf1, 0xe5, 0x30}
+    };
+
+    SubBytes(state);
+
+    ASSERT(memcmp(state, expected_state, sizeof(state_t)) == 0, "SubBytes failed.");
+    return true;
+}
+int test_ShiftRows() {
+    state_t state = {
+    {0x00, 0x01, 0x02, 0x03},
+    {0x10, 0x11, 0x12, 0x13},
+    {0x20, 0x21, 0x22, 0x23},
+    {0x30, 0x31, 0x32, 0x33}
+    };
+
+    state_t expected = {
+    {0x00, 0x01, 0x02, 0x03},
+    {0x11, 0x12, 0x13, 0x10},
+    {0x22, 0x23, 0x20, 0x21},
+    {0x33, 0x30, 0x31, 0x32}
+    };
+
+    ShiftRows(state);
+
+    ASSERT(memcmp(state, expected, sizeof(state_t)) == 0, "ShiftRows failed.");
+    return true;
+}
+int test_mul_word_Galois_field() {
+    uint8_t a = 0x53;
+    uint8_t b = 0xCA;
+    uint8_t expected = 0x01;
+    uint8_t result = mul_word_Galois_field(a,b);
+    ASSERT(expected != result, "mul failed");
+    return true;
+}
 
 int main() {
     printf("\033[0;35m");
@@ -194,7 +236,9 @@ int main() {
     RUN_TEST(test_stateToString);
     RUN_TEST(test_create_key);
     RUN_TEST(test_AddRoundKey);
-
+    RUN_TEST(test_SubBytes);
+    RUN_TEST(test_ShiftRows);
+    RUN_TEST(test_mul_word_finite_field);
     printf("\033[0;35m");
     printf("All tests completed.\n");
     printf("\033[0m");
