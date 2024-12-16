@@ -11,12 +11,14 @@
 #define state_row_len 4
 #define state_col_len 4
 
-typedef uint8_t state_t[state_row_len][state_col_len];
+typedef uint8_t state_t[state_col_len][state_row_len];
+typedef uint8_t key_128[16];
+typedef uint8_t key_192[24];
+typedef uint8_t key_256[32];
 
 // Public Functions (DLL Main Functions)
 void create_key(uint8_t *key, size_t key_size);
 void create_iv(uint8_t *key);
-
 
 // void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  without iv: ECB CTR
 // void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv);  //Accepts CBC CFB OFB PCBC  without iv: ECB CTR
@@ -25,24 +27,29 @@ void create_iv(uint8_t *key);
 // void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 
 // Internal AES Core Functions
+void Cipher(state_t state, const uint8_t *key, size_t key_size);
 void AddRoundKey(state_t state, const uint8_t *round_key);
 void SubBytes(state_t state);
 void ShiftRows(state_t state);
 void MixColumns(state_t state);
 void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size);
-void RotWord(uint8_t *word);
-void SubWord(uint8_t *word);
 
 // Inverse Operations
 void InvSubBytes(state_t state);
 void InvShiftRows(state_t state);
 void InvMixColumns(state_t state);
 
+// Internal AES Utilities Functions
+uint8_t gf_multiply(uint8_t a, uint8_t b);
+void mix_single_column(uint8_t* col);
+void RotWord(uint8_t *word);
+void SubWord(uint8_t *word);
+
 // Utilities
 void stringToState(const char *input, state_t state);
 void stateToString(const state_t state, char *output);
-uint8_t mul_word_finite_field(uint8_t a, uint8_t b);
-
+void print_state(const state_t state);
+void print_round_keys(const uint8_t *round_keys, size_t num_rounds);
 // Encryption/Decryption Core
 void aes_encrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);
 void aes_decrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);

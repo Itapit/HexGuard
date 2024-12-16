@@ -32,14 +32,20 @@ static const uint8_t sbox[256] = {
     0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
     0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
 };
-
-static const uint8_t Rcon[15] = {
-    0x01, 0x02, 0x04, 0x08, 0x10,
-    0x20, 0x40, 0x80, 0x1B, 0x36,
-    0x6C, 0xD8, 0xAB, 0x4D, 0x9A
+// Constant matrix for keyExpansion
+static const uint8_t Rcon[16] = {
+    0x00, 0x01, 0x02, 0x04, 0x08,
+    0x10, 0x20, 0x40, 0x80, 0x1B,
+    0x36, 0x6C, 0xD8, 0xAB, 0x4D, 0x9A
 };
-
-// Public Functions (DLL Main Functions)
+// Constant matrix for MixColumns transformation
+static const uint8_t mix_matrix[4][4] = {
+    {0x02, 0x03, 0x01, 0x01},
+    {0x01, 0x02, 0x03, 0x01},
+    {0x01, 0x01, 0x02, 0x03},
+    {0x03, 0x01, 0x01, 0x02}
+};
+// ------------- Public Functions (DLL Main Functions) -------------
 void create_key(uint8_t *key, size_t key_size){  // key_size accept 128 192 256
     //TODO fix the generation to an actual random keys
 
@@ -57,8 +63,148 @@ void create_iv(uint8_t *key){
         key[i] = rand() & 0xFF;
     }
 }
+// ------------- Internal AES Core Functions -------------
+void Cipher(state_t state, const uint8_t *key, size_t key_size) {
+    int Nr;  // Number of rounds
+    int Nk = key_size / 32;
 
-// Internal AES Core Functions
+    // Determine number of rounds based on key size
+    if (Nk == 4) {
+        Nr = 10;  // AES-128
+    } else if (Nk == 6) {
+        Nr = 12;  // AES-192
+    } else if (Nk == 8) {
+        Nr = 14;  // AES-256
+    } else {
+        printf("Invalid key size.\n");
+        return;
+    }
+    int round_keys_size = AES_BLOCK_SIZE * (Nr + 1);
+    uint8_t *round_keys = (uint8_t *)calloc(round_keys_size, sizeof(uint8_t));
+//     uint8_t round_keys[] = {
+//     // Round 0
+//     0x2b, 0x28, 0xab, 0x09,
+//     0x7e, 0xae, 0xf7, 0xcf,
+//     0x15, 0xd2, 0x15, 0x4f,
+//     0x16, 0xa6, 0x88, 0x3c,
+
+//     // Round 1
+//     0xa0, 0x88, 0x23, 0x2a,
+//     0xfa, 0x54, 0xa3, 0x6c,
+//     0xfe, 0x2c, 0x39, 0x76,
+//     0x17, 0xb1, 0x39, 0x05,
+
+//     // Round 2
+//     0xf2, 0x7a, 0x59, 0x73,
+//     0xc2, 0x96, 0x35, 0x59,
+//     0x95, 0xb9, 0x80, 0xf6,
+//     0xf2, 0x43, 0x7a, 0x7f,
+
+//     // Round 3
+//     0x3d, 0x47, 0x1e, 0x6d,
+//     0x80, 0x16, 0x23, 0x7a,
+//     0x47, 0xfe, 0x7e, 0x88,
+//     0x7d, 0x3e, 0x44, 0x3b,
+
+//     // Round 4
+//     0xef, 0xa8, 0xb6, 0xdb,
+//     0x44, 0x52, 0x71, 0x0b,
+//     0xa5, 0x5b, 0x25, 0xad,
+//     0x41, 0x7f, 0x3b, 0x00,
+
+//     // Round 5
+//     0xd4, 0x7c, 0xca, 0x11,
+//     0xd1, 0x83, 0xf2, 0xf9,
+//     0xc6, 0x9d, 0xb8, 0x15,
+//     0xf8, 0x87, 0xbc, 0xbc,
+
+//     // Round 6
+//     0x6d, 0x11, 0xdb, 0xca,
+//     0x88, 0x0b, 0xf9, 0x00,
+//     0xa3, 0x3e, 0x86, 0x93,
+//     0x7a, 0xfd, 0x41, 0xfd,
+
+//     // Round 7
+//     0x4e, 0x5f, 0x84, 0x4e,
+//     0x54, 0x5f, 0xa6, 0xa6,
+//     0xf7, 0xc9, 0x4f, 0xdc,
+//     0x0e, 0xf3, 0xb2, 0x4f,
+
+//     // Round 8
+//     0xea, 0xb5, 0x31, 0x7f,
+//     0xd2, 0x8d, 0x2b, 0x8d,
+//     0x73, 0xba, 0xf5, 0x29,
+//     0x21, 0xd2, 0x60, 0x2f,
+
+//     // Round 9
+//     0xac, 0x19, 0x28, 0x57,
+//     0x77, 0xfa, 0xd1, 0x5c,
+//     0x66, 0xdc, 0x29, 0x00,
+//     0xf3, 0x21, 0x41, 0x6e,
+
+//     // Round 10
+//     0xd0, 0xc9, 0xe1, 0xb6,
+//     0x14, 0xee, 0x3f, 0x63,
+//     0xf9, 0x25, 0x0c, 0x0c,
+//     0xa8, 0x89, 0xc8, 0xa6
+// };
+
+    if (round_keys == NULL) {
+        printf("Memory allocation failed.\n");
+        return;
+    }
+    // Generate round keys
+    KeyExpansion(key, round_keys, key_size);
+
+    // printf("\033[0;35m");
+    // printf("input state:\n");
+    // printf("\033[0m");
+    // print_state(state);
+
+    // Initial Round
+    AddRoundKey(state, &round_keys[0]);
+
+    // printf("\033[0;35m");
+    // printf("round number 1\n");
+    // printf("\033[0m");
+    // print_state(state);
+
+    // Main Rounds
+    for (int round = 1; round < Nr; round++) {
+        SubBytes(state);
+        // printf("\033[0;35m");
+        // printf("After Subbytes round number %d:\n", round+1);
+        // printf("\033[0m");
+        // print_state(state);
+        ShiftRows(state);
+        // printf("\033[0;35m");
+        // printf("After ShiftRows round number %d:\n", round+1);
+        // printf("\033[0m");
+        // print_state(state);
+        MixColumns(state);
+        // printf("\033[0;35m");
+        // printf("After MixColumns round number %d:\n", round+1);
+        // printf("\033[0m");
+        // print_state(state);
+        AddRoundKey(state, &round_keys[round * AES_BLOCK_SIZE]);
+        // printf("Round key value num:%d\n",round);
+        // print_state(&round_keys[round * AES_BLOCK_SIZE]);
+        // printf("\033[0;35m");
+        // printf("round number %d:\n", round+1);
+        // printf("\033[0m");
+        // print_state(state);
+    }
+    // Final Round
+    SubBytes(state);
+    ShiftRows(state);
+    AddRoundKey(state, &round_keys[Nr * AES_BLOCK_SIZE]);
+    // printf("\033[0;35m");
+    // printf("final round\n");
+    // printf("\033[0m");
+    // print_state(state);
+    
+    //free(round_keys);
+}
 void AddRoundKey(state_t state, const uint8_t *round_key) {
     for (int row = 0; row < 4; row++) {
         for (int col = 0; col < 4; col++) {
@@ -85,7 +231,66 @@ void ShiftRows(state_t state) {
         }
     }
 }
-uint8_t mul_word_Galois_field(uint8_t a, uint8_t b) {
+void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size) {
+    int Nk = key_size / 32;   //number of words in the key
+    int Nr; //number of rounds
+    if(Nk == 4){
+        Nr = 10;}
+    else if (Nk == 6){
+        Nr = 12;}
+    else if (Nk == 8){
+        Nr = 14;}
+    else{
+        printf("Invalid key size. Supported sizes are 128, 192, and 256 bits.\n");
+        return;
+    }
+    // printf("Nk: %d\n", Nk);
+    // printf("Nr: %d\n", Nr);
+    uint8_t temp[4];
+    int i = 0;
+
+    // Copy the original key to the first Nk words of the key schedule
+    memcpy(key_schedule, key, Nk * 4);
+
+    // Generate the remaining words
+    for (i = Nk; i < Nb * (Nr + 1); i++) {
+        memcpy(temp, &key_schedule[(i - 1) * 4], 4);
+
+        if (i % Nk == 0) {
+            RotWord(temp);
+            SubWord(temp);
+            temp[0] ^= Rcon[i / Nk]; // Apply Rcon directly
+        }
+        else if (Nk > 6 && i % Nk == 4) {
+            SubWord(temp);
+        }
+
+        for (int j = 0; j < 4; j++) {
+            key_schedule[i * 4 + j] = key_schedule[(i - Nk) * 4 + j] ^ temp[j];
+        }
+    }
+}
+void MixColumns(state_t state) {
+    uint8_t column[4];  // Temporary array to hold a column
+    for (int col = 0; col < 4; col++) {
+        // Extract the column from the state
+        for (int row = 0; row < 4; row++) {
+            column[row] = state[row][col];
+        }
+
+        // Perform MixColumns transformation on the column
+        mix_single_column(column);
+
+        // Write the transformed column back into the state
+        for (int row = 0; row < 4; row++) {
+            state[row][col] = column[row];
+        }
+    }
+}
+
+
+// ------------- Internal AES Utilities Functions -------------
+uint8_t gf_multiply(uint8_t a, uint8_t b) {
     /*
     Performs multiplication in the finite field GF(2^8) using the
     AES irreducible polynomial x^8 + x^4 + x^3 + x + 1 (0x1B).
@@ -122,44 +327,18 @@ uint8_t mul_word_Galois_field(uint8_t a, uint8_t b) {
     }
     return p;
 }
-void KeyExpansion(const uint8_t *key, uint8_t *key_schedule, size_t key_size) {
-    int Nk = key_size / 32;   //number of words in the key
-    int Nr; //number of rounds
-    if(Nk == 4){
-        Nr = 10;}
-    else if (Nk == 6){
-        Nr = 12;}
-    else if (Nk == 8){
-        Nr = 10;}
-    else{
-        printf("Invalid key size. Supported sizes are 128, 192, and 256 bits.\n");
-        return;
-    }
-
+void mix_single_column(uint8_t* col) {
     uint8_t temp[4];
-    int i = 0;
-
-    // Copy the original key to the first Nk words of the key schedule
-    memcpy(key_schedule, key, Nk * 4);
-
-    // Generate the remaining words
-    for (i = Nk; i < Nb * (Nr + 1); i++) {
-        memcpy(temp, &key_schedule[(i - 1) * 4], 4);
-
-        if (i % Nk == 0) {
-            RotWord(temp);
-            SubWord(temp);
-            temp[0] ^= Rcon[i / Nk]; // Apply Rcon directly
-        } else if (Nk > 6 && i % Nk == 4) {
-            SubWord(temp);
-        }
-
-        for (int j = 0; j < 4; j++) {
-            key_schedule[i * 4 + j] = key_schedule[(i - Nk) * 4 + j] ^ temp[j];
-        }
+    for (int i = 0; i < 4; i++) {
+        temp[i] = gf_multiply(mix_matrix[i][0], col[0]) ^
+                  gf_multiply(mix_matrix[i][1], col[1]) ^
+                  gf_multiply(mix_matrix[i][2], col[2]) ^
+                  gf_multiply(mix_matrix[i][3], col[3]);
+    }
+    for (int i = 0; i < 4; i++) {
+        col[i] = temp[i];
     }
 }
-
 void RotWord(uint8_t *word) {
     uint8_t temp = word[0];
     word[0] = word[1];
@@ -167,15 +346,14 @@ void RotWord(uint8_t *word) {
     word[2] = word[3];
     word[3] = temp;
 }
-
 void SubWord(uint8_t *word) {
     for (int i = 0; i < 4; i++) {
         word[i] = sbox[word[i]];
     }
 }
-
-// Utilities
+// ------------- Utilities Functions -------------
 void stringToState(const char *input, state_t state){
+    //TODO add padding
     if (strlen(input) != AES_BLOCK_SIZE) {
         return;
     }
@@ -185,7 +363,6 @@ void stringToState(const char *input, state_t state){
         }
     }  
 }
-
 void stateToString(const state_t state, char *output){
     for (int row = 0; row < state_row_len; row++){
         for (int col = 0; col < state_col_len; col++){
@@ -193,4 +370,25 @@ void stateToString(const state_t state, char *output){
         }
     }
     output[AES_BLOCK_SIZE] = '\0';
+}
+void print_state(const state_t state) {
+    for (int row = 0; row < state_row_len; row++) {
+        for (int col = 0; col < state_col_len; col++) {
+            printf("0x%02x ", state[row][col]);
+        }
+        printf("\n");
+    }
+}
+void print_round_keys(const uint8_t *round_keys, size_t num_rounds) {
+    for (size_t round = 0; round <= num_rounds; round++) {
+        
+        printf("\033[0;34mRound %zu:\033[0m\n", round);
+        for (size_t row = 0; row < 4; row++) {
+            for (size_t col = 0; col < 4; col++) {
+                printf("0x%02x ", round_keys[round * 16 + row * 4 + col]);
+            }
+            printf("\n");
+        }
+        printf("\n"); 
+    }
 }
