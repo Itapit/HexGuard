@@ -163,18 +163,12 @@ bool test_SubWord() {
     return true;
 }
 bool test_KeyExpansion_128() {
-    key_128 key = {//appendix cipher
-        0x2b, 0x7e, 0x15, 0x16, 
-        0x28, 0xae, 0xd2, 0xa6, 
-        0xab, 0xf7, 0x15, 0x88, 
-        0x09, 0xcf, 0x4f, 0x3c
-    };
-    // key_128 key = {   //appendix key expansion
-    //     0x2b, 0x7e, 0x15, 0x16, 
-    //     0x28, 0xae, 0xd2, 0xa6, 
-    //     0xab, 0xf7, 0x15, 0x88, 
-    //     0x09, 0xcf, 0x4f, 0x3c
-    // };
+    const char *hex_line = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
+    uint8_t key[16];  // For AES-128 key size (16 bytes)
+
+    hex_line_to_key(hex_line, key, 16);
+    // print_key(key, 16);
+
      uint8_t expected_round_keys[176] = {  //appendix key expansion
         0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c, // Round 0
         0xa0, 0xfa, 0xfe, 0x17, 0x88, 0x54, 0x2c, 0xb1, 0x23, 0xa3, 0x39, 0x39, 0x2a, 0x6c, 0x76, 0x05, // Round 1
@@ -192,8 +186,8 @@ bool test_KeyExpansion_128() {
     uint8_t round_keys[176];
     KeyExpansion(key, round_keys, 128);
 
-    printf("Generated Round Keys:\n");
-    print_round_keys(round_keys, 10);
+    // printf("Generated Round Keys:\n");
+    // print_round_keys(round_keys, 10);
 
     ASSERT(memcmp(round_keys, expected_round_keys, sizeof(expected_round_keys)) == 0, "KeyExpansion for AES-128 failed.");
     return true;
@@ -262,26 +256,26 @@ bool test_keyExpansion_256() {
 bool test_AddRoundKey() {
     // Input state
     state_t state = {
-        {0x00, 0x11, 0x22, 0x33},
-        {0x44, 0x55, 0x66, 0x77},
-        {0x88, 0x99, 0xAA, 0xBB},
-        {0xCC, 0xDD, 0xEE, 0xFF}
+        {0x32, 0x88, 0x31, 0xe0}, 
+        {0x43, 0x5a, 0x31, 0x37}, 
+        {0xf6, 0x30, 0x98, 0x07}, 
+        {0xa8, 0x8d, 0xa2, 0x34}
     };
 
     // Round key
     uint8_t round_key[16] = {
-        0x01, 0x01, 0x01, 0x01,
-        0x01, 0x01, 0x01, 0x01,
-        0x01, 0x01, 0x01, 0x01,
-        0x01, 0x01, 0x01, 0x01
+        0x2b, 0x7e, 0x15, 0x16,
+        0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88,
+        0x09, 0xcf, 0x4f, 0x3c
     };
 
     // Expected result
     state_t expected_state = {
-        {0x01, 0x10, 0x23, 0x32},
-        {0x45, 0x54, 0x67, 0x76},
-        {0x89, 0x98, 0xAB, 0xBA},
-        {0xCD, 0xDC, 0xEF, 0xFE}
+        {0x19, 0xa0, 0x9a, 0xe9}, 
+        {0x3d, 0xf4, 0xc6, 0xf8}, 
+        {0xe3, 0xe2, 0x8d, 0x48}, 
+        {0xbe, 0x2b, 0x2a, 0x08}
     };
 
     // Call AddRoundKey
@@ -354,21 +348,17 @@ bool test_gf_multiply() {
     return true;
 }
 bool test_mix_single_column() {
-    // Example input column from AES documentation
-    uint8_t input_col[4] = {0xdb, 0x13, 0x53, 0x45};  // Input column
-    uint8_t expected_col[4] = {0x8e, 0x4d, 0xa1, 0xbc};  // Expected output column
+    uint8_t input_col[4] = {0xdb, 0x13, 0x53, 0x45};
+    uint8_t expected_col[4] = {0x8e, 0x4d, 0xa1, 0xbc}; 
 
-    // Call mix_single_column
     mix_single_column(input_col);
 
-    // Print the output column for debugging
-    printf("Output column after mix_single_column:\n");
-    for (int i = 0; i < 4; i++) {
-        printf("0x%02x ", input_col[i]);
-    }
-    printf("\n");
+    // printf("Output column after mix_single_column:\n");
+    // for (int i = 0; i < 4; i++) {
+    //     printf("0x%02x ", input_col[i]);
+    // }
+    // printf("\n");
 
-    // Assert the result matches the expected column
     ASSERT(memcmp(input_col, expected_col, 4) == 0, "mix_single_column produced incorrect results");
 
     return true;
@@ -406,28 +396,25 @@ bool test_MixColumns() {
     return true;
 }
 bool test_Cipher() {
-    state_t state = {
-        {0x32, 0x43, 0xf6, 0xa8}, 
-        {0x88, 0x5a, 0x30, 0x8d}, 
-        {0x31, 0x31, 0x98, 0xa2}, 
-        {0xe0, 0x37, 0x07, 0x34}
-    };
-    key_128 key = {
-        0x2b, 0x7e, 0x15, 0x16, 
-        0x28, 0xae, 0xd2, 0xa6, 
-        0xab, 0xf7, 0x15, 0x88, 
-        0x09, 0xcf, 0x4f, 0x3c
-    };
+    const char *state_hex ="32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34";
+    state_t state;
+    hex_line_to_state(state_hex, state);
+    //print_state(state);
+
+    const char *key_hex = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
+    key_128 key; 
+
+    hex_line_to_key(key_hex, key, 16);
     state_t expected_state = {
-        {0x39, 0x25, 0x84, 0x1d},
-        {0x02, 0xdc, 0x09, 0xfb},
-        {0xdc, 0x11, 0x85, 0x97},
-        {0x19, 0x6a, 0x0b, 0x32}
+        {0x39, 0x02, 0xdc, 0x19}, 
+        {0x25, 0xdc, 0x11, 0x6a}, 
+        {0x84, 0x09, 0x85, 0x0b}, 
+        {0x1d, 0xfb, 0x97, 0x32}
     };
 
     Cipher(state, key, 128);
 
-    print_state(state);
+    // print_state(state);
     ASSERT(memcmp(state, expected_state, sizeof(state_t)) == 0, "Cipher failed.");
     return true;
 }
@@ -439,20 +426,20 @@ int main() {
     printf("\033[0m");
 
     // Run tests
-    // RUN_TEST(test_stringToState);
-    // RUN_TEST(test_stateToString);
-    // RUN_TEST(test_create_key);
-    // RUN_TEST(test_RotWord);
-    // RUN_TEST(test_SubWord);
-    // RUN_TEST(test_KeyExpansion_128);
-    // RUN_TEST(test_KeyExpansion_192);
-    // RUN_TEST(test_keyExpansion_256);
-    // RUN_TEST(test_AddRoundKey);
-    // RUN_TEST(test_SubBytes);
-    // RUN_TEST(test_ShiftRows);
-    // RUN_TEST(test_gf_multiply);
-    // RUN_TEST(test_mix_single_column);
-    // RUN_TEST(test_MixColumns);
+    RUN_TEST(test_stringToState);
+    RUN_TEST(test_stateToString);
+    RUN_TEST(test_create_key);
+    RUN_TEST(test_RotWord);
+    RUN_TEST(test_SubWord);
+    RUN_TEST(test_KeyExpansion_128);
+    RUN_TEST(test_KeyExpansion_192);
+    RUN_TEST(test_keyExpansion_256);
+    RUN_TEST(test_AddRoundKey);
+    RUN_TEST(test_SubBytes);
+    RUN_TEST(test_ShiftRows);
+    RUN_TEST(test_gf_multiply);
+    RUN_TEST(test_mix_single_column);
+    RUN_TEST(test_MixColumns);
     RUN_TEST(test_Cipher);
     printf("\033[0;35m");
     printf("All tests completed.\n");

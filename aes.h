@@ -46,10 +46,13 @@ void RotWord(uint8_t *word);
 void SubWord(uint8_t *word);
 
 // Utilities
+void hex_line_to_state(const char *hex_line, state_t state);
+void hex_line_to_key(const char *hex_line, uint8_t *key, size_t key_size);
 void stringToState(const char *input, state_t state);
 void stateToString(const state_t state, char *output);
 void print_state(const state_t state);
 void print_round_keys(const uint8_t *round_keys, size_t num_rounds);
+void print_key(const uint8_t *key, size_t key_size);
 // Encryption/Decryption Core
 void aes_encrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);
 void aes_decrypt_block(const uint8_t *input, uint8_t *output, const uint8_t *key, size_t key_size);
