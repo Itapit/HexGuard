@@ -96,21 +96,37 @@ void create_iv(uint8_t *key){
         key[i] = rand() & 0xFF;
     }
 }
-void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key,size_t key_size, const uint8_t *iv) {
+
+void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv) {
     int input_len = strlen(input_text);
-    char buffer_str[BLOCK_SIZE_BYTES] = {0};
-    int buffer_counter = 0;
-    state_t buffer_State;
-    for (int i = 0; i < input_len; i+= BLOCK_SIZE_BYTES)
-    {
-        memset(buffer_str,0,sizeof(buffer_str)); //clear the string buffer
-        int bytes_to_copy = (input_len - i) < BLOCK_SIZE_BYTES ? (input_len - i) : BLOCK_SIZE_BYTES;  //copy 16 bytes or less from the input_text to buffer
-        memcpy(buffer_str, input_text + i, bytes_to_copy);
-        stringToState((char *)buffer_str, buffer_State);  //convert the buffer string to buffer state
-        Cipher(buffer_State,key,key_size);  //encrypt the buffer state
-        stateToString(buffer_State,(char *)buffer_str);  // convert the buffer state back to string
-        memcpy(output_text + i, buffer_str, BLOCK_SIZE_BYTES);   //copy the buffer string to output
+    int padded_len = 0;
+    
+    // Step 1: Allocate memory dynamically for padded input
+    char *padded_input = (char *)malloc(input_len + BLOCK_SIZE_BYTES);  // Ensure space for padding
+    if (!padded_input) {
+        printf("Memory allocation failed.\n");
+        return;
     }
+
+    // Step 2: Add PKCS#7 padding
+    add_pkcs7_padding(input_text, padded_input, &padded_len);
+
+    if (strcmp(Mode_of_operation, "ECB") == 0) {
+        encrypt_text_ECB(padded_input, output_text, key, key_size, padded_len);
+    } 
+    else if (strcmp(Mode_of_operation, "CBC") == 0) {
+        encrypt_text_CBC(padded_input, output_text, key, key_size, iv, padded_len);
+    }
+    else if (strcmp(Mode_of_operation, "CFB") == 0) {
+        encrypt_text_CFB(padded_input, output_text, key, key_size, iv, padded_len);
+    }
+    else if (strcmp(Mode_of_operation, "OFB") == 0) {
+        encrypt_text_OFB(padded_input, output_text, key, key_size, iv, padded_len);
+    }
+    else {
+        printf("Invalid mode of operation: %s\n", Mode_of_operation);
+    }
+    free(padded_input);
 }
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
@@ -545,4 +561,48 @@ void print_key(const uint8_t *key, size_t key_size) {
     }
     printf("\n");
 }
+void add_pkcs7_padding(const char *input, char *output, size_t *padded_len) {
+    size_t input_len = strlen(input);  // Calculate the input length
+    size_t padding_needed = BLOCK_SIZE_BYTES - (input_len % BLOCK_SIZE_BYTES);  // Calculate padding size
+    *padded_len = input_len + padding_needed;  // Final padded length
+
+    // Copy the original input into the output buffer
+    memcpy(output, input, input_len);
+
+    // Add padding bytes (each byte = padding_needed)
+    for (size_t i = input_len; i < *padded_len; i++) {
+        output[i] = (uint8_t)padding_needed;
+    }
+}
+void remove_pkcs7_padding(char *input, size_t input_len, size_t *unpadded_len) {
+    if (input_len == 0) {
+        printf("Error: Input length is zero.\n");
+        *unpadded_len = 0;
+        return;
+    }
+
+    // Get the padding value from the last byte
+    uint8_t padding_value = input[input_len - 1];
+
+    // Validate the padding value
+    if (padding_value == 0 || padding_value > BLOCK_SIZE_BYTES) {
+        printf("Error: Invalid padding detected.\n");
+        *unpadded_len = 0;  // Return error length
+        return;
+    }
+
+    // Check all padding bytes
+    for (size_t i = input_len - padding_value; i < input_len; i++) {
+        if (input[i] != padding_value) {
+            printf("Error: Padding validation failed.\n");
+            *unpadded_len = 0;  // Return error length
+            return;
+        }
+    }
+
+    // Calculate the new unpadded length and null-terminate the input
+    *unpadded_len = input_len - padding_value;
+    input[*unpadded_len] = '\0';
+}
+
 #pragma endregion
