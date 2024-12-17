@@ -85,6 +85,34 @@ bool test_create_key() {
 
     return true;
 }
+bool test_encrypt_text_ECB() {
+    const char *input_text = "Hello, AES ECB!";
+    const char *key_hex = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
+
+    key_128 key;
+    hex_line_to_key(key_hex, key, KEY_SIZE_BYTES_128);  // Convert key from hex
+
+    const uint8_t expected_output[] = {
+        0x33, 0xa1, 0xfc, 0xcb, 0xd7, 0x20, 0x1b, 0xe1,
+        0x8c, 0x63, 0xf9, 0x2b, 0x7c, 0xf7, 0x57, 0xcc
+    };
+
+    char output_text[BLOCK_SIZE_BYTES * 2] = {0};  // Output buffer for encrypted text
+
+    // Call encrypt_text for ECB mode
+    encrypt_text("ECB", input_text, output_text, key, KEY_SIZE_BITS_128, NULL);
+
+    // printf("Actual Encrypted Output (Hex): ");
+    // for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+    //     printf("%02x ", (uint8_t)output_text[i]);
+    // }
+    // printf("\n");
+
+    // Verify the encrypted output matches the expected result
+    ASSERT(memcmp(output_text, expected_output, BLOCK_SIZE_BYTES) == 0, "encrypt_text ECB failed.");
+
+    return true;
+}
 
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
@@ -529,6 +557,7 @@ int main() {
     RUN_TEST(test_InvShiftRows);
     RUN_TEST(test_InvMixColumns);
     RUN_TEST(test_InvCipher);
+    RUN_TEST(test_encrypt_text_ECB);
     printf("\033[0;35m");
     printf("All tests completed.\n");
     printf("\033[0m");

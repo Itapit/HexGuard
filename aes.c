@@ -96,10 +96,9 @@ void create_iv(uint8_t *key){
         key[i] = rand() & 0xFF;
     }
 }
-
-void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv) {
+void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     int input_len = strlen(input_text);
-    int padded_len = 0;
+    size_t padded_len = 0;
     
     // Step 1: Allocate memory dynamically for padded input
     char *padded_input = (char *)malloc(input_len + BLOCK_SIZE_BYTES);  // Ensure space for padding
@@ -114,19 +113,34 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     if (strcmp(Mode_of_operation, "ECB") == 0) {
         encrypt_text_ECB(padded_input, output_text, key, key_size, padded_len);
     } 
-    else if (strcmp(Mode_of_operation, "CBC") == 0) {
-        encrypt_text_CBC(padded_input, output_text, key, key_size, iv, padded_len);
-    }
-    else if (strcmp(Mode_of_operation, "CFB") == 0) {
-        encrypt_text_CFB(padded_input, output_text, key, key_size, iv, padded_len);
-    }
-    else if (strcmp(Mode_of_operation, "OFB") == 0) {
-        encrypt_text_OFB(padded_input, output_text, key, key_size, iv, padded_len);
-    }
+    // else if (strcmp(Mode_of_operation, "CBC") == 0) {
+    //     encrypt_text_CBC(padded_input, output_text, key, key_size, iv, padded_len);
+    // }
+    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
+    //     encrypt_text_CFB(padded_input, output_text, key, key_size, iv, padded_len);
+    // }
+    // else if (strcmp(Mode_of_operation, "OFB") == 0) {
+    //     encrypt_text_OFB(padded_input, output_text, key, key_size, iv, padded_len);
+    // }
     else {
         printf("Invalid mode of operation: %s\n", Mode_of_operation);
     }
     free(padded_input);
+}
+#pragma endregion
+#pragma region ---------- Modes of operations Functions ----------
+void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len){
+    state_t buffer_State;
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
+        // Step 1: Convert the current 16-byte block to AES state
+        stringToState(input_text + i, buffer_State);
+
+        // Step 2: Encrypt the block using the Cipher function
+        Cipher(buffer_State, key, key_size);
+
+        // Step 3: Convert the encrypted state back to string format
+        stateToString(buffer_State, output_text + i);
+    }
 }
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
