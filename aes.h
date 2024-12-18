@@ -21,7 +21,7 @@ typedef uint8_t state_t[state_col_len][state_row_len];
 typedef uint8_t key_128[16];
 typedef uint8_t key_192[24];
 typedef uint8_t key_256[32];
-
+typedef uint8_t iv_def[16]; 
 extern const uint8_t mix_matrix[4][4];
 #pragma endregion
 #pragma region ---------- Public Functions (DLL Main Functions) ----------
@@ -74,6 +74,7 @@ void print_round_keys(const uint8_t *round_keys, size_t num_rounds);
 void print_key(const uint8_t *key, size_t key_size);
 void add_pkcs7_padding(const char *input, char *output, size_t *padded_len);
 void remove_pkcs7_padding(char *input, size_t input_len, size_t *unpadded_len);
+void xor_iv_state(state_t state, const uint8_t *iv);
 #pragma endregion
 
 #endif 

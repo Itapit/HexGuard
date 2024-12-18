@@ -100,14 +100,13 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     int input_len = strlen(input_text);
     size_t padded_len = 0;
     
-    // Step 1: Allocate memory dynamically for padded input
+    // Allocate memory dynamically for padded input
     char *padded_input = (char *)malloc(input_len + BLOCK_SIZE_BYTES);  // Ensure space for padding
     if (!padded_input) {
         printf("Memory allocation failed.\n");
         return;
     }
-
-    // Step 2: Add PKCS#7 padding
+    // Add PKCS#7 padding
     add_pkcs7_padding(input_text, padded_input, &padded_len);
 
     if (strcmp(Mode_of_operation, "ECB") == 0) {
@@ -127,21 +126,60 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     }
     free(padded_input);
 }
+void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    int input_len = strlen(input_text);
+    size_t * unpadded_len;
+
+    if (strcmp(Mode_of_operation, "ECB") == 0) {
+        decrypt_text_ECB(input_text, output_text, key, key_size, input_len);
+    } 
+    // else if (strcmp(Mode_of_operation, "CBC") == 0) {
+    //     
+    // }
+    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
+    //     
+    // }
+    // else if (strcmp(Mode_of_operation, "OFB") == 0) {
+    //     
+    // }
+    else {
+        printf("Invalid mode of operation: %s\n", Mode_of_operation);
+    }
+    remove_pkcs7_padding(output_text, input_len, unpadded_len); // handle the removal of the padding and adding null terminator
+}
 #pragma endregion
 #pragma region ---------- Modes of operations Functions ----------
 void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len){
     state_t buffer_State;
     for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
-        // Step 1: Convert the current 16-byte block to AES state
+        // Convert the current 16-byte block to AES state
         stringToState(input_text + i, buffer_State);
 
-        // Step 2: Encrypt the block using the Cipher function
+        // Encrypt the block using the Cipher function
         Cipher(buffer_State, key, key_size);
 
-        // Step 3: Convert the encrypted state back to string format
+        // Convert the encrypted state back to string format
         stateToString(buffer_State, output_text + i);
     }
 }
+void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len) {
+    state_t buffer_State;
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES)
+    {
+        // Convert the current 16-byte block to AES state
+        stringToState(input_text + i, buffer_State);
+
+        // Decrypt the block using the InvCipher function
+        InvCipher(buffer_State, key, key_size);
+
+        // Convert the decrypted state back to string format
+        stateToString(buffer_State, output_text + i);
+    }
+}
+// void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {  
+//     state_t buffer_current_state;
+//     state_t buffer_previous_state;
+// }
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
 // ------------- Internal AES Core Functions -------------
