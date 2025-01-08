@@ -30,8 +30,8 @@ void create_key(uint8_t *key, size_t key_size);
 void create_iv(uint8_t *key);
 
 // void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  or without iv: ECB CTR
-void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  without iv: ECB CTR
-
+void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv);//Accepts CBC CFB OFB PCBC  without iv: ECB CTR
+void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t input_len, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 // void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 // void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 #pragma endregion
@@ -40,6 +40,9 @@ void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *k
 void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 void encrypt_text_OFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 void encrypt_text_CFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
+
+void decrypt_text_ECB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, size_t input_len);
+
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
 // Internal AES Core Functions
@@ -72,8 +75,8 @@ void stateToString(const state_t state, char *output);
 void print_state(const state_t state);
 void print_round_keys(const uint8_t *round_keys, size_t num_rounds);
 void print_key(const uint8_t *key, size_t key_size);
-void add_pkcs7_padding(const char *input, char *output, size_t *padded_len);
-void remove_pkcs7_padding(char *input, size_t input_len, size_t *unpadded_len);
+void add_pkcs7_padding(const char *input, size_t input_len, char *output, size_t *padded_len);
+void remove_pkcs7_padding(char *input, int input_len, size_t *unpadded_len);
 void xor_iv_state(state_t state, const uint8_t *iv);
 #pragma endregion
 

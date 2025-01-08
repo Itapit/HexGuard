@@ -85,48 +85,58 @@ bool test_create_key() {
 
     return true;
 }
-bool test_encrypt_text_ECB() {
+bool test_encrypt_and_decrypt_text_ECB() {
     const char *input_text = "Hello, AES ECB!";
-    const char *key_hex = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
 
-    key_128 key;
-    hex_line_to_key(key_hex, key, KEY_SIZE_BYTES_128);  // Convert key from hex
-
-    const uint8_t expected_output[] = {
-        0x33, 0xa1, 0xfc, 0xcb, 0xd7, 0x20, 0x1b, 0xe1,
-        0x8c, 0x63, 0xf9, 0x2b, 0x7c, 0xf7, 0x57, 0xcc
+    const key_128 key = { 
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c 
     };
 
-    char output_text[BLOCK_SIZE_BYTES * 2] = {0};  // Output buffer for encrypted text
-
-    // Call encrypt_text for ECB mode
-    encrypt_text("ECB", input_text, output_text, key, KEY_SIZE_BITS_128, NULL);
-
-    // printf("Actual Encrypted Output (Hex): ");
+    char encrypted_text[BLOCK_SIZE_BYTES * 2] = {0}; // Buffer for encrypted text
+    char decrypted_text[BLOCK_SIZE_BYTES * 2] = {0}; // Buffer for decrypted text
+    size_t encrypted_len = 0;
+    // printf("decrypted text at start of test: ");
     // for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
-    //     printf("%02x ", (uint8_t)output_text[i]);
+    //     printf("%02x ", (uint8_t)input_text[i]);
+    // }
+    // printf("\n");
+    encrypt_text("ECB", input_text, encrypted_text, &encrypted_len, key, KEY_SIZE_BITS_128, NULL);
+
+    // printf("Encrypted text after encrypt_text function: ");
+    // for (size_t i = 0; i < BLOCK_SIZE_BYTES*2; i++) {
+    //     printf("%02x ", (uint8_t)encrypted_text[i]);
     // }
     // printf("\n");
 
-    // Verify the encrypted output matches the expected result
-    ASSERT(memcmp(output_text, expected_output, BLOCK_SIZE_BYTES) == 0, "encrypt_text ECB failed.");
+    decrypt_text("ECB", encrypted_text, encrypted_len, decrypted_text, key, KEY_SIZE_BITS_128, NULL);
+
+    // printf("decrypted text after decrypt: ");
+    // for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+    //     printf("%02x ", (uint8_t)decrypted_text[i]);
+    // }
+    // printf("\n");
+
+    ASSERT(strcmp(decrypted_text, input_text) == 0, "decrypt_text ECB failed.");
 
     return true;
 }
-
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
 // ------------- Internal AES Core Functions -------------
 bool test_Cipher() {
-    const char *state_hex ="32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34";
-    state_t state;
-    hex_line_to_state(state_hex, state);
-    //print_state(state);
+    state_t state = {
+        {0x32, 0x88, 0x31, 0xe0},
+        {0x43, 0x5a, 0x31, 0x37},
+        {0xf6, 0x30, 0x98, 0x07},
+        {0xa8, 0x8d, 0xa2, 0x34}
+    };
 
-    const char *key_hex = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
-    key_128 key; 
-
-    hex_line_to_key(key_hex, key, 16);
+    const key_128 key = { 
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c 
+    };
+    
     state_t expected_state = {
         {0x39, 0x02, 0xdc, 0x19}, 
         {0x25, 0xdc, 0x11, 0x6a}, 
@@ -323,30 +333,28 @@ bool test_keyExpansion_256() {
 }
 //Inverse functions:
 bool test_InvCipher() {
-    const char *state_hex = "32 43 f6 a8 88 5a 30 8d 31 31 98 a2 e0 37 07 34";
-    const char *key_hex = "2b 7e 15 16 28 ae d2 a6 ab f7 15 88 09 cf 4f 3c";
+    const key_128 key = { 
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c 
+    };
 
-    state_t original_state, state;
-    key_128 key;
+    const state_t ciphertext = {
+        {0x39, 0x02, 0xdc, 0x19}, 
+        {0x25, 0xdc, 0x11, 0x6a}, 
+        {0x84, 0x09, 0x85, 0x0b}, 
+        {0x1d, 0xfb, 0x97, 0x32}
+    };
+    state_t expected_plaintext = {
+        {0x32, 0x88, 0x31, 0xe0},
+        {0x43, 0x5a, 0x31, 0x37},
+        {0xf6, 0x30, 0x98, 0x07},
+        {0xa8, 0x8d, 0xa2, 0x34}
+    };
 
-    // Convert input hex strings to state and key
-    hex_line_to_state(state_hex, original_state);
-    hex_line_to_key(key_hex, key, KEY_SIZE_BYTES_128);
-
-    // Make a copy of the original state to encrypt and decrypt
-    memcpy(state, original_state, sizeof(state_t));
-    // printf("og state:\n");
-    // print_state(state);
-    // Perform encryption
-    Cipher(state, key, KEY_SIZE_BITS_128);
-    // printf("state after cipher:\n");
-    // print_state(state);
-    // Perform decryption
-    InvCipher(state, key, KEY_SIZE_BITS_128);
-    // printf("state after invCipher\n");
-    // print_state(state);
-    // Compare the decrypted state with the original state
-    ASSERT(memcmp(state, original_state, sizeof(state_t)) == 0, "InvCipher failed.");
+    state_t state;
+    memcpy(state, ciphertext, sizeof(state));
+    InvCipher(state, key, 128);
+    ASSERT(memcmp(state, expected_plaintext, sizeof(state)) == 0, "InvCipher failed to produce the expected plaintext.");
 
     return true;
 }
@@ -365,7 +373,6 @@ bool test_InvSubBytes() {
     };
 
     InvSubBytes(state);
-
     ASSERT(memcmp(state, expected_state, sizeof(state_t)) == 0, "InvSubBytes failed.");
     return true;
 }
@@ -384,7 +391,6 @@ bool test_InvShiftRows() {
     };
 
     InvShiftRows(state);
-
     ASSERT(memcmp(state, expected_state, sizeof(state_t)) == 0, "InvShiftRows failed.");
     return true;
 }
@@ -402,7 +408,6 @@ bool test_InvMixColumns() {
         {0x30, 0xae, 0xf1, 0xe5}
     };
     InvMixColumns(state);
-    //print_state(state);
     ASSERT(memcmp(state, expected_state, sizeof(state_t)) == 0, "InvMixColumns failed.");
     return true;
 }
@@ -475,58 +480,28 @@ bool test_stringToState() {
     char input[] = "abcdefghijklmnop";
     //state after function
     state_t state;
-
     state_t expected_state = {
-        {0x61, 0x62, 0x63, 0x64}, // 'a', 'b', 'c', 'd'
-        {0x65, 0x66, 0x67, 0x68}, // 'e', 'f', 'g', 'h'
-        {0x69, 0x6a, 0x6b, 0x6c}, // 'i', 'j', 'k', 'l'
-        {0x6d, 0x6e, 0x6f, 0x70}  // 'm', 'n', 'o', 'p'
+        {0x61, 0x65, 0x69, 0x6d}, // 'a', 'e', 'i', 'm'
+        {0x62, 0x66, 0x6a, 0x6e}, // 'b', 'f', 'j', 'n'
+        {0x63, 0x67, 0x6b, 0x6f}, // 'c', 'g', 'k', 'o'
+        {0x64, 0x68, 0x6c, 0x70}  // 'd', 'h', 'l', 'p'
     };
     
     stringToState(input, state);
-
-    // printf("Actual state:\n");
-    // for (int i = 0; i < 4; i++) {
-    //     for (int j = 0; j < 4; j++) {
-    //         printf("%c ", state[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // // Print expected state
-    // printf("Expected state:\n");
-    // for (int i = 0; i < 4; i++) {
-    //     for (int j = 0; j < 4; j++) {
-    //         printf("%c ", expected_state[i][j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // printf("%d\n", memcmp(state, expected_state, 16));
     ASSERT(memcmp(state, expected_state, 16) == 0, "stringToState failed.");
-
     return true;
 }
 bool test_stateToString() {
     state_t state = {
-        {0x61, 0x62, 0x63, 0x64}, // 'a', 'b', 'c', 'd'
-        {0x65, 0x66, 0x67, 0x68}, // 'e', 'f', 'g', 'h'
-        {0x69, 0x6a, 0x6b, 0x6c}, // 'i', 'j', 'k', 'l'
-        {0x6d, 0x6e, 0x6f, 0x70}  // 'm', 'n', 'o', 'p'
+        {0x61, 0x65, 0x69, 0x6d}, // 'a', 'e', 'i', 'm'
+        {0x62, 0x66, 0x6a, 0x6e}, // 'b', 'f', 'j', 'n'
+        {0x63, 0x67, 0x6b, 0x6f}, // 'c', 'g', 'k', 'o'
+        {0x64, 0x68, 0x6c, 0x70}  // 'd', 'h', 'l', 'p'
     };
     char given_str[BLOCK_SIZE_BYTES + 1] = {0};
     char expected_output[] = "abcdefghijklmnop";
     
     stateToString(state, given_str);
-
-    // printf("Actual string:\n");
-    // for (int i = 0; i < 16; i++)
-    // {
-    //     printf("%c", given_str[i]);
-    // }printf("\n");
-    // printf("Expected string:\n");
-    // printf("%s\n", expected_output);
-
     ASSERT(memcmp(given_str, expected_output, BLOCK_SIZE_BYTES) == 0, "stateToString failed.");
     return true;
 }
@@ -557,7 +532,7 @@ int main() {
     RUN_TEST(test_InvShiftRows);
     RUN_TEST(test_InvMixColumns);
     RUN_TEST(test_InvCipher);
-    RUN_TEST(test_encrypt_text_ECB);
+    RUN_TEST(test_encrypt_and_decrypt_text_ECB);
     printf("\033[0;35m");
     printf("All tests completed.\n");
     printf("\033[0m");
