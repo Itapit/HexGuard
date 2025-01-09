@@ -32,6 +32,8 @@ void create_iv(uint8_t *key);
 // void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  or without iv: ECB CTR
 void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv);//Accepts CBC CFB OFB PCBC  without iv: ECB CTR
 void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t input_len, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv);
+void encrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv);
+void decrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 // void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 // void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
 #pragma endregion

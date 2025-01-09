@@ -96,29 +96,34 @@ bool test_encrypt_and_decrypt_text_ECB() {
     char encrypted_text[BLOCK_SIZE_BYTES * 2] = {0}; // Buffer for encrypted text
     char decrypted_text[BLOCK_SIZE_BYTES * 2] = {0}; // Buffer for decrypted text
     size_t encrypted_len = 0;
-    // printf("decrypted text at start of test: ");
-    // for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
-    //     printf("%02x ", (uint8_t)input_text[i]);
-    // }
-    // printf("\n");
+
     encrypt_text("ECB", input_text, encrypted_text, &encrypted_len, key, KEY_SIZE_BITS_128, NULL);
-
-    // printf("Encrypted text after encrypt_text function: ");
-    // for (size_t i = 0; i < BLOCK_SIZE_BYTES*2; i++) {
-    //     printf("%02x ", (uint8_t)encrypted_text[i]);
-    // }
-    // printf("\n");
-
     decrypt_text("ECB", encrypted_text, encrypted_len, decrypted_text, key, KEY_SIZE_BITS_128, NULL);
-
-    // printf("decrypted text after decrypt: ");
-    // for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
-    //     printf("%02x ", (uint8_t)decrypted_text[i]);
-    // }
-    // printf("\n");
 
     ASSERT(strcmp(decrypted_text, input_text) == 0, "decrypt_text ECB failed.");
 
+    return true;
+}
+bool test_encrypt_file_ECB() {
+    const char *input_file = "hello.txt";
+    const char *output_file = "encrypted.txt";
+    uint8_t key[KEY_SIZE_BYTES_128] = {
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
+    };
+    encrypt_file(input_file, output_file, key, KEY_SIZE_BITS_128, NULL);
+    return true;
+}
+bool test_decrypt_file_ECB() {
+    const char *encrypted_file = "encrypted.txt";
+    const char *decrypted_file = "hello2.txt";
+
+    uint8_t key[KEY_SIZE_BYTES_128] = {
+        0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6,
+        0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c
+    };
+
+    decrypt_file(encrypted_file, decrypted_file, key, KEY_SIZE_BITS_128, NULL);
     return true;
 }
 #pragma endregion
@@ -533,6 +538,8 @@ int main() {
     RUN_TEST(test_InvMixColumns);
     RUN_TEST(test_InvCipher);
     RUN_TEST(test_encrypt_and_decrypt_text_ECB);
+    // RUN_TEST(test_encrypt_file_ECB);
+    RUN_TEST(test_decrypt_file_ECB);
     printf("\033[0;35m");
     printf("All tests completed.\n");
     printf("\033[0m");

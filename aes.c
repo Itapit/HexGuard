@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <io.h>
 
 #include "aes.h"
 #define state_row_len 4
@@ -147,6 +148,106 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
 
     remove_pkcs7_padding(output_text, input_len, &unpadded_len); // handle the removal of the padding and adding null terminator
 }
+void encrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    FILE *input_file = fopen(input_file_path, "rb");
+    if (!input_file) {
+        perror("Failed to open input file");
+        return;
+    }
+
+    FILE *output_file = fopen(output_file_path, "wb");
+    if (!output_file) {
+        perror("Failed to open output file");
+        fclose(input_file);
+        return;
+    }
+
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        // If the block is smaller than BLOCK_SIZE_BYTES, apply padding
+        if (bytes_read < BLOCK_SIZE_BYTES) {
+            size_t padded_len;
+            uint8_t padded_buffer[BLOCK_SIZE_BYTES];
+            add_pkcs7_padding((char *)buffer, bytes_read, (char *)padded_buffer, &padded_len);
+            memcpy(buffer, padded_buffer, BLOCK_SIZE_BYTES);
+        }
+
+        // Encrypt the block directly using Cipher
+        state_t state;
+        stringToState((char *)buffer, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)encrypted_buffer);
+
+        // Write the encrypted block to the output file
+        if (fwrite(encrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file) != BLOCK_SIZE_BYTES) {
+            perror("Failed to write to output file");
+            break;
+        }
+    }
+
+    fclose(input_file);
+    fclose(output_file);
+}
+void decrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    FILE *input_file = fopen(input_file_path, "rb");
+    if (!input_file) {
+        perror("Failed to open input file");
+        return;
+    }
+
+    FILE *output_file = fopen(output_file_path, "wb");
+    if (!output_file) {
+        perror("Failed to open output file");
+        fclose(input_file);
+        return;
+    }
+
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+    size_t last_block_size = 0;
+
+    // Read and decrypt blocks
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        last_block_size = bytes_read; // Track the size of the last block read
+
+        // Decrypt the block
+        state_t state;
+        stringToState((char *)buffer, state);
+        InvCipher(state, key, key_size);
+        stateToString(state, (char *)decrypted_buffer);
+
+        // Write decrypted block to output file
+        fwrite(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+    }
+
+    // Handle padding removal for the last block
+    if (last_block_size == BLOCK_SIZE_BYTES) {
+        // Read the last written block, remove padding, and rewrite it
+        fseek(output_file, -BLOCK_SIZE_BYTES, SEEK_END); // Move to the start of the last block
+        fread(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+        size_t unpadded_len;
+        remove_pkcs7_padding((char *)decrypted_buffer, BLOCK_SIZE_BYTES, &unpadded_len);
+
+        // Rewrite the last block without padding
+        fseek(output_file, -BLOCK_SIZE_BYTES, SEEK_END);
+        fwrite(decrypted_buffer, 1, unpadded_len, output_file);
+
+        // Truncate the file to remove extra padding bytes
+        int fd = fileno(output_file); // Get file descriptor
+        if (_chsize(fd, ftell(output_file)) != 0) {
+            perror("Failed to truncate file");
+        }
+        // TODO add cross platform option for trunc
+    }
+
+    fclose(input_file);
+    fclose(output_file);
+}
+
 #pragma endregion
 #pragma region ---------- Modes of operations Functions ----------
 void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len){
