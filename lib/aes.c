@@ -97,6 +97,7 @@ void create_iv(uint8_t *key){
         key[i] = rand() & 0xFF;
     }
 }
+
 void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     int input_len = strlen(input_text);
     (void)iv;  //TODO remove after implementing cbc , just for mute warning
@@ -111,9 +112,9 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     if (strcmp(Mode_of_operation, "ECB") == 0) {
         encrypt_text_ECB(padded_input, output_text, key, key_size, *output_len);
     } 
-    // else if (strcmp(Mode_of_operation, "CBC") == 0) {
-    //     encrypt_text_CBC(padded_input, output_text, key, key_size, iv, padded_len);
-    // }
+    else if (strcmp(Mode_of_operation, "CBC") == 0) {
+        encrypt_text_CBC(padded_input, output_text, key, key_size, iv, *output_len);
+    }
     // else if (strcmp(Mode_of_operation, "CFB") == 0) {
     //     encrypt_text_CFB(padded_input, output_text, key, key_size, iv, padded_len);
     // }
@@ -132,9 +133,9 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
     if (strcmp(Mode_of_operation, "ECB") == 0) {
         decrypt_text_ECB(input_text, output_text, key, key_size, input_len);
     } 
-    // else if (strcmp(Mode_of_operation, "CBC") == 0) {
-    //     
-    // }
+    else if (strcmp(Mode_of_operation, "CBC") == 0) {
+        decrypt_text_CBC(input_text, output_text, key, key_size, iv, input_len);
+    }
     // else if (strcmp(Mode_of_operation, "CFB") == 0) {
     //     
     // }
@@ -275,10 +276,45 @@ void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *k
         stateToString(buffer_State, output_text + i);
     }
 }
-// void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {  
-//     state_t buffer_current_state;
-//     state_t buffer_previous_state;
-// }
+void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
+    state_t buffer_current_state;
+    state_t buffer_previous_state;
+    memcpy(buffer_previous_state, iv, sizeof(iv));
+    
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
+        // Convert the current 16-byte block to AES state
+        stringToState(input_text + i, buffer_current_state);
+        //xor the previus state with the current in order to implement CBC
+        xor_state_state(buffer_current_state, buffer_previous_state);
+        // Encrypt the block using the Cipher function
+        Cipher(buffer_current_state, key, key_size);
+        memcpy(buffer_previous_state, buffer_current_state, sizeof(buffer_current_state));
+        // Convert the encrypted state back to string format
+        stateToString(buffer_current_state, output_text + i);
+    }
+}
+void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
+    // the decryption is reversed, last block first
+    state_t buffer_current_state;
+    state_t buffer_previous_state;
+    for (size_t i = input_len - BLOCK_SIZE_BYTES ; i > BLOCK_SIZE_BYTES; i -= BLOCK_SIZE_BYTES)
+    {
+        // Convert the current and previus 16-byte block to AES state
+        stringToState(input_text + i - BLOCK_SIZE_BYTES, buffer_previous_state);
+        stringToState(input_text + i, buffer_current_state);
+        // Decrypt the block using the InvCipher function
+        InvCipher(buffer_current_state, key, key_size);
+        //xor the previus state with the current in order to implement CBC
+        xor_state_state(buffer_current_state, buffer_previous_state);
+        // Convert the decrypted state back to string format
+        stateToString(buffer_current_state, output_text + i);
+    }
+    memcpy(buffer_previous_state, iv, sizeof(iv));
+    stringToState(input_text, buffer_current_state);
+    InvCipher(buffer_current_state, key, key_size);
+    xor_state_state(buffer_current_state, buffer_previous_state);
+    stateToString(buffer_current_state, output_text);
+}
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
 // ------------- Internal AES Core Functions -------------
@@ -746,5 +782,12 @@ void remove_pkcs7_padding(char *input, int input_len, size_t *unpadded_len) {
     input[*unpadded_len] = '\0';
     return;
 }
-
+void xor_state_state(state_t state_primary, const state_t state) {
+    for (int i = 0; i < state_col_len; i++) {
+        for (int j = 0; j < state_row_len; j++) {
+            memcpy(state_primary[i][j] , state_primary[i][j]^state[i][j], sizeof(uint8_t));
+        }
+        
+    }
+}
 #pragma endregion
