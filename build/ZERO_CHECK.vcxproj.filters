@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="C:\Users\Sir1Beany\JAVA - Yaron\HexGuard\build\CMakeFiles\2aa7787fd01cb6f9d21c84dbfcaa574d\generate.stamp.rule">
+    <CustomBuild Include="C:\Users\Administrator\Documents\GitHub\HexGuard\build\CMakeFiles\be253d9a39456c9f53bcd3c9684e18ec\generate.stamp.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{952DE657-4942-34B0-B11A-B67620568E2B}</UniqueIdentifier>
+      <UniqueIdentifier>{C7A11C7A-30A6-334F-8746-CC92EBC59B89}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
