@@ -149,7 +149,7 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
 
     remove_pkcs7_padding(output_text, input_len, &unpadded_len); // handle the removal of the padding and adding null terminator
 }
-void encrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+void encrypt_file(const char * Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     FILE *input_file = fopen(input_file_path, "rb");
     if (!input_file) {
         perror("Failed to open input file");
@@ -163,86 +163,70 @@ void encrypt_file(const char *input_file_path, const char *output_file_path, con
         return;
     }
 
-    uint8_t buffer[BLOCK_SIZE_BYTES];
-    uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
-    size_t bytes_read;
-
-    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
-        // If the block is smaller than BLOCK_SIZE_BYTES, apply padding
-        if (bytes_read < BLOCK_SIZE_BYTES) {
-            size_t padded_len;
-            uint8_t padded_buffer[BLOCK_SIZE_BYTES];
-            add_pkcs7_padding((char *)buffer, bytes_read, (char *)padded_buffer, &padded_len);
-            memcpy(buffer, padded_buffer, BLOCK_SIZE_BYTES);
-        }
-
-        // Encrypt the block directly using Cipher
-        state_t state;
-        stringToState((char *)buffer, state);
-        Cipher(state, key, key_size);
-        stateToString(state, (char *)encrypted_buffer);
-
-        // Write the encrypted block to the output file
-        if (fwrite(encrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file) != BLOCK_SIZE_BYTES) {
-            perror("Failed to write to output file");
-            break;
-        }
+    if (strcmp(Mode_of_operation, "ECB") == 0) {
+        encrypt_file_ECB(input_file, output_file, key, key_size, iv);
+    } 
+    else if (strcmp(Mode_of_operation, "CBC") == 0) {
+        encrypt_file_CBC(input_file, output_file, key, key_size, iv);
+    }
+    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
+    //     encrypt_file_CFB(input_file, output_file, key, key_size, iv);
+    // }
+    // else if (strcmp(Mode_of_operation, "OFB") == 0) {
+    //     encrypt_file_OFB(input_file, output_file, key, key_size, iv);
+    // }
+    else {
+        //TODO add actual error
+        printf("Invalid mode of operation: %s\n", Mode_of_operation);
     }
 
     fclose(input_file);
     fclose(output_file);
 }
-void decrypt_file(const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+void decrypt_file(const char *Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     FILE *input_file = fopen(input_file_path, "rb");
     if (!input_file) {
         perror("Failed to open input file");
         return;
     }
 
-    FILE *output_file = fopen(output_file_path, "wb");
+    FILE *output_file = fopen(output_file_path, "wb+");
     if (!output_file) {
         perror("Failed to open output file");
         fclose(input_file);
         return;
     }
 
-    uint8_t buffer[BLOCK_SIZE_BYTES];
-    uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
-    size_t bytes_read;
     size_t last_block_size = 0;
-
-    // Read and decrypt blocks
-    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
-        last_block_size = bytes_read; // Track the size of the last block read
-
-        // Decrypt the block
-        state_t state;
-        stringToState((char *)buffer, state);
-        InvCipher(state, key, key_size);
-        stateToString(state, (char *)decrypted_buffer);
-
-        // Write decrypted block to output file
-        fwrite(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+    if (strcmp(Mode_of_operation, "ECB") == 0) {
+        last_block_size = decrypt_file_ECB(input_file, output_file, key, key_size, iv);
+    } 
+    else if (strcmp(Mode_of_operation, "CBC") == 0) {
+        last_block_size = decrypt_file_CBC(input_file, output_file, key, key_size, iv);
+    } 
+    else {
+        printf("Invalid mode of operation: %s\n", Mode_of_operation);
+        fclose(input_file);
+        fclose(output_file);
+        return;
     }
 
-    // Handle padding removal for the last block
+    // Handle unpadding for the last block
     if (last_block_size == BLOCK_SIZE_BYTES) {
-        // Read the last written block, remove padding, and rewrite it
-        fseek(output_file, -BLOCK_SIZE_BYTES, SEEK_END); // Move to the start of the last block
+        uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
+        fseek(output_file, -BLOCK_SIZE_BYTES, SEEK_END);
         fread(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+
         size_t unpadded_len;
         remove_pkcs7_padding((char *)decrypted_buffer, BLOCK_SIZE_BYTES, &unpadded_len);
 
-        // Rewrite the last block without padding
         fseek(output_file, -BLOCK_SIZE_BYTES, SEEK_END);
         fwrite(decrypted_buffer, 1, unpadded_len, output_file);
 
-        // Truncate the file to remove extra padding bytes
-        int fd = fileno(output_file); // Get file descriptor
+        int fd = fileno(output_file);
         if (_chsize(fd, ftell(output_file)) != 0) {
             perror("Failed to truncate file");
         }
-        // TODO add cross platform option for trunc
     }
 
     fclose(input_file);
@@ -264,18 +248,6 @@ void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *k
         stateToString(buffer_State, output_text + i);
     }
 }
-void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len) {
-    state_t buffer_State;
-    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES)
-    {
-        // Convert the current 16-byte block to AES state
-        stringToState(input_text + i, buffer_State);
-        // Decrypt the block using the InvCipher function
-        InvCipher(buffer_State, key, key_size);
-        // Convert the decrypted state back to string format
-        stateToString(buffer_State, output_text + i);
-    }
-}
 void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
     state_t buffer_current_state;
     state_t buffer_previous_state;
@@ -291,6 +263,19 @@ void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *k
         memcpy(buffer_previous_state, buffer_current_state, sizeof(buffer_current_state));
         // Convert the encrypted state back to string format
         stateToString(buffer_current_state, output_text + i);
+    }
+}
+
+void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len) {
+    state_t buffer_State;
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES)
+    {
+        // Convert the current 16-byte block to AES state
+        stringToState(input_text + i, buffer_State);
+        // Decrypt the block using the InvCipher function
+        InvCipher(buffer_State, key, key_size);
+        // Convert the decrypted state back to string format
+        stateToString(buffer_State, output_text + i);
     }
 }
 void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
@@ -314,6 +299,125 @@ void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *
     InvCipher(buffer_current_state, key, key_size);
     xor_state_state(buffer_current_state, buffer_previous_state);
     stateToString(buffer_current_state, output_text);
+}
+
+void encrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        // If the block is smaller than BLOCK_SIZE_BYTES, apply padding
+        if (bytes_read < BLOCK_SIZE_BYTES) {
+            size_t padded_len;
+            uint8_t padded_buffer[BLOCK_SIZE_BYTES];
+            add_pkcs7_padding((char *)buffer, bytes_read, (char *)padded_buffer, &padded_len);
+            memcpy(buffer, padded_buffer, BLOCK_SIZE_BYTES);
+        }
+
+        // Encrypt the block using ECB
+        state_t state;
+        stringToState((char *)buffer, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)encrypted_buffer);
+
+        // Write the encrypted block to the output file
+        if (fwrite(encrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file) != BLOCK_SIZE_BYTES) {
+            perror("Failed to write to output file");
+            break;
+        }
+    }
+}
+void encrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
+    uint8_t previous_block[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+
+    // Initialize the previous block with the IV
+    memcpy(previous_block, iv, BLOCK_SIZE_BYTES);
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        // If the block is smaller than BLOCK_SIZE_BYTES, apply padding
+        if (bytes_read < BLOCK_SIZE_BYTES) {
+            size_t padded_len;
+            uint8_t padded_buffer[BLOCK_SIZE_BYTES];
+            add_pkcs7_padding((char *)buffer, bytes_read, (char *)padded_buffer, &padded_len);
+            memcpy(buffer, padded_buffer, BLOCK_SIZE_BYTES);
+        }
+
+        // XOR the current block with the previous block (CBC mode)
+        for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+            buffer[i] ^= previous_block[i];
+        }
+
+        // Encrypt the block using ECB
+        state_t state;
+        stringToState((char *)buffer, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)encrypted_buffer);
+
+        // Update the previous block
+        memcpy(previous_block, encrypted_buffer, BLOCK_SIZE_BYTES);
+
+        // Write the encrypted block to the output file
+        if (fwrite(encrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file) != BLOCK_SIZE_BYTES) {
+            perror("Failed to write to output file");
+            break;
+        }
+    }
+}
+
+size_t decrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+    size_t last_block_size = 0;
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        last_block_size = bytes_read;
+
+        // Decrypt the block using ECB
+        state_t state;
+        stringToState((char *)buffer, state);
+        InvCipher(state, key, key_size);
+        stateToString(state, (char *)decrypted_buffer);
+
+        fwrite(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+    }
+    return last_block_size;
+}
+size_t decrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
+    uint8_t previous_block[BLOCK_SIZE_BYTES];
+    uint8_t temp_block[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+    size_t last_block_size = 0;
+
+    memcpy(previous_block, iv, BLOCK_SIZE_BYTES);
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        last_block_size = bytes_read;
+
+        memcpy(temp_block, buffer, BLOCK_SIZE_BYTES);
+
+        // Decrypt the block using ECB
+        state_t state;
+        stringToState((char *)buffer, state);
+        InvCipher(state, key, key_size);
+        stateToString(state, (char *)decrypted_buffer);
+
+        // XOR the decrypted block with the previous block
+        for (size_t i = 0; i < BLOCK_SIZE_BYTES; i++) {
+            decrypted_buffer[i] ^= previous_block[i];
+        }
+
+        memcpy(previous_block, temp_block, BLOCK_SIZE_BYTES);
+
+        fwrite(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
+    }
+    return last_block_size;
 }
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------

@@ -9,8 +9,6 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 
 
-
-
 # Create AES library
 add_library(aes
     lib/aes.c
