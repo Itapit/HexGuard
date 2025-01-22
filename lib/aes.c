@@ -115,9 +115,9 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     else if (strcmp(Mode_of_operation, "CBC") == 0) {
         encrypt_text_CBC(padded_input, output_text, key, key_size, iv, *output_len);
     }
-    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
-    //     encrypt_text_CFB(padded_input, output_text, key, key_size, iv, padded_len);
-    // }
+    else if (strcmp(Mode_of_operation, "CFB") == 0) {
+        encrypt_text_CFB(padded_input, output_text, key, key_size, iv, *output_len);
+    }
     // else if (strcmp(Mode_of_operation, "OFB") == 0) {
     //     encrypt_text_OFB(padded_input, output_text, key, key_size, iv, padded_len);
     // }
@@ -136,9 +136,9 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
     else if (strcmp(Mode_of_operation, "CBC") == 0) {
         decrypt_text_CBC(input_text, output_text, key, key_size, iv, input_len);
     }
-    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
-    //     
-    // }
+    else if (strcmp(Mode_of_operation, "CFB") == 0) {
+        decrypt_text_CFB(input_text, output_text, key, key_size, iv, input_len);
+    }
     // else if (strcmp(Mode_of_operation, "OFB") == 0) {
     //     
     // }
@@ -150,28 +150,28 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
     remove_pkcs7_padding(output_text, input_len, &unpadded_len); // handle the removal of the padding and adding null terminator
 }
 void encrypt_file(const char * Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    
     FILE *input_file = fopen(input_file_path, "rb");
     if (!input_file) {
-        perror("Failed to open input file");
+        printf("Failed to open input file");
         return;
     }
 
     FILE *output_file = fopen(output_file_path, "wb");
     if (!output_file) {
-        perror("Failed to open output file");
+        printf("Failed to open output file");
         fclose(input_file);
         return;
     }
-
     if (strcmp(Mode_of_operation, "ECB") == 0) {
         encrypt_file_ECB(input_file, output_file, key, key_size, iv);
     } 
     else if (strcmp(Mode_of_operation, "CBC") == 0) {
         encrypt_file_CBC(input_file, output_file, key, key_size, iv);
     }
-    // else if (strcmp(Mode_of_operation, "CFB") == 0) {
-    //     encrypt_file_CFB(input_file, output_file, key, key_size, iv);
-    // }
+    else if (strcmp(Mode_of_operation, "CFB") == 0) {
+        encrypt_file_CFB(input_file, output_file, key, key_size, iv);
+    }
     // else if (strcmp(Mode_of_operation, "OFB") == 0) {
     //     encrypt_file_OFB(input_file, output_file, key, key_size, iv);
     // }
@@ -203,7 +203,10 @@ void decrypt_file(const char *Mode_of_operation, const char *input_file_path, co
     } 
     else if (strcmp(Mode_of_operation, "CBC") == 0) {
         last_block_size = decrypt_file_CBC(input_file, output_file, key, key_size, iv);
-    } 
+    }
+    else if (strcmp(Mode_of_operation, "CFB") == 0) {
+        last_block_size = decrypt_file_CFB(input_file, output_file, key, key_size, iv);
+    }
     else {
         printf("Invalid mode of operation: %s\n", Mode_of_operation);
         fclose(input_file);
@@ -265,6 +268,31 @@ void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *k
         stateToString(buffer_current_state, output_text + i);
     }
 }
+void encrypt_text_CFB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
+    uint8_t shift_register[BLOCK_SIZE_BYTES];
+    uint8_t keystream[BLOCK_SIZE_BYTES];
+
+    // Initialize the shift register with the IV
+    memcpy(shift_register, iv, BLOCK_SIZE_BYTES);
+
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
+        size_t segment_len = (i + BLOCK_SIZE_BYTES <= input_len) ? BLOCK_SIZE_BYTES : (input_len - i);
+
+        // Encrypt the current shift register to produce the keystream
+        state_t state;
+        stringToState((char *)shift_register, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)keystream);
+
+        // XOR the plaintext with the keystream to produce the ciphertext segment
+        for (size_t j = 0; j < segment_len; j++) {
+            output_text[i + j] = input_text[i + j] ^ keystream[j];
+        }
+
+        // Update the shift register with the ciphertext segment
+        memcpy(shift_register, &output_text[i], segment_len);
+    }
+}
 
 void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len) {
     state_t buffer_State;
@@ -300,12 +328,36 @@ void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *
     xor_state_state(buffer_current_state, buffer_previous_state);
     stateToString(buffer_current_state, output_text);
 }
+void decrypt_text_CFB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len) {
+    uint8_t shift_register[BLOCK_SIZE_BYTES];
+    uint8_t keystream[BLOCK_SIZE_BYTES];
+
+    // Initialize the shift register with the IV
+    memcpy(shift_register, iv, BLOCK_SIZE_BYTES);
+
+    for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
+        size_t segment_len = (i + BLOCK_SIZE_BYTES <= input_len) ? BLOCK_SIZE_BYTES : (input_len - i);
+
+        // Encrypt the current shift register to produce the keystream
+        state_t state;
+        stringToState((char *)shift_register, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)keystream);
+
+        // XOR the ciphertext with the keystream to produce the plaintext segment
+        for (size_t j = 0; j < segment_len; j++) {
+            output_text[i + j] = input_text[i + j] ^ keystream[j];
+        }
+
+        // Update the shift register with the ciphertext segment
+        memcpy(shift_register, &input_text[i], segment_len);
+    }
+}
 
 void encrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     uint8_t buffer[BLOCK_SIZE_BYTES];
     uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
     size_t bytes_read;
-
     while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
         // If the block is smaller than BLOCK_SIZE_BYTES, apply padding
         if (bytes_read < BLOCK_SIZE_BYTES) {
@@ -367,6 +419,35 @@ void encrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key, c
         }
     }
 }
+void encrypt_file_CFB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t shift_register[BLOCK_SIZE_BYTES];
+    uint8_t keystream[BLOCK_SIZE_BYTES];
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t ciphertext[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+
+    // Initialize the shift register with the IV
+    memcpy(shift_register, iv, BLOCK_SIZE_BYTES);
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        // Encrypt the current shift register to produce the keystream
+        state_t state;
+        stringToState((char *)shift_register, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)keystream);
+
+        // XOR the plaintext with the keystream to produce the ciphertext segment
+        for (size_t i = 0; i < bytes_read; i++) {
+            ciphertext[i] = buffer[i] ^ keystream[i];
+        }
+
+        // Write the ciphertext to the output file
+        fwrite(ciphertext, 1, bytes_read, output_file);
+
+        // Update the shift register with the ciphertext segment
+        memcpy(shift_register, ciphertext, bytes_read);
+    }
+}
 
 size_t decrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     uint8_t buffer[BLOCK_SIZE_BYTES];
@@ -418,6 +499,36 @@ size_t decrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key,
         fwrite(decrypted_buffer, 1, BLOCK_SIZE_BYTES, output_file);
     }
     return last_block_size;
+}
+size_t decrypt_file_CFB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+    uint8_t shift_register[BLOCK_SIZE_BYTES];
+    uint8_t keystream[BLOCK_SIZE_BYTES];
+    uint8_t buffer[BLOCK_SIZE_BYTES];
+    uint8_t plaintext[BLOCK_SIZE_BYTES];
+    size_t bytes_read;
+
+    // Initialize the shift register with the IV
+    memcpy(shift_register, iv, BLOCK_SIZE_BYTES);
+
+    while ((bytes_read = fread(buffer, 1, BLOCK_SIZE_BYTES, input_file)) > 0) {
+        // Encrypt the current shift register to produce the keystream
+        state_t state;
+        stringToState((char *)shift_register, state);
+        Cipher(state, key, key_size);
+        stateToString(state, (char *)keystream);
+
+        // XOR the ciphertext with the keystream to produce the plaintext segment
+        for (size_t i = 0; i < bytes_read; i++) {
+            plaintext[i] = buffer[i] ^ keystream[i];
+        }
+
+        // Write the plaintext to the output file
+        fwrite(plaintext, 1, bytes_read, output_file);
+
+        // Update the shift register with the ciphertext segment
+        memcpy(shift_register, buffer, bytes_read);
+    }
+    return 0;
 }
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------

@@ -40,17 +40,20 @@ void decrypt_file(const char *Mode_of_operation, const char *input_file_path, co
 #pragma region ---------- Modes of operations Functions ----------
 void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len);
 void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
-void encrypt_text_OFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 void encrypt_text_CFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
+void encrypt_text_OFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 
 void decrypt_text_ECB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, size_t input_len);
 void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
+void decrypt_text_CFB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 
 void encrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 void encrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
+void encrypt_file_CFB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 
 size_t decrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 size_t decrypt_file_CBC(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
+size_t decrypt_file_CFB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv);
 #pragma endregion
 #pragma region ---------- Internal AES Core Functions ----------
 // Internal AES Core Functions
