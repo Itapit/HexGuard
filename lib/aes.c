@@ -5,6 +5,14 @@
 #include <stdlib.h>
 #include <io.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+    #include <wincrypt.h>
+#else
+    #include <fcntl.h>
+    #include <unistd.h>
+#endif
+
 #include "aes.h"
 #define state_row_len 4
 #define state_col_len 4
@@ -80,27 +88,32 @@ static const uint8_t inv_mix_matrix[4][4] = {
 #pragma endregion
 #pragma region ---------- Public Functions (DLL Main Functions) ----------
 // ------------- Public Functions (DLL Main Functions) -------------
-void create_key(uint8_t *key, size_t key_size){  // key_size accept 128 192 256
-    //TODO fix the generation to an actual random keys
 
-    if (key_size != KEY_SIZE_BITS_128 && key_size != KEY_SIZE_BITS_192 && key_size != KEY_SIZE_BITS_256){
-        printf("key size is invalid");
+AES_API void create_key(uint8_t *key, size_t key_size_bits) {
+    // key_size_bits is expected as 128, 192, or 256 bits
+    if (key_size_bits != KEY_SIZE_BITS_128 &&
+        key_size_bits != KEY_SIZE_BITS_192 &&
+        key_size_bits != KEY_SIZE_BITS_256) {
+        printf("Invalid key size.\n");
         return;
     }
-    for (size_t i = 0; i < key_size / 8; i++) {
-        key[i] = rand() & 0xFF;
+    
+    size_t key_size_bytes = key_size_bits / 8;
+    if (!get_random_bytes(key, key_size_bytes)) {
+        fprintf(stderr, "Error generating secure key.\n");
+        return;
     }
 }
-void create_iv(uint8_t *key){
-    //TODO fix the generation to an actual random iv
-    for (int i = 0; i < KEY_SIZE_BYTES_128; i++) {
-        key[i] = rand() & 0xFF;
+AES_API void create_iv(uint8_t *iv) {
+    // For AES, the IV is 16 bytes (128 bits)
+    if (!get_random_bytes(iv, KEY_SIZE_BYTES_128)) {
+        printf("Error generating secure IV.\n");
+        return;
     }
 }
 
-void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+AES_API void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     int input_len = strlen(input_text);
-    (void)iv;  //TODO remove after implementing cbc , just for mute warning
     char *padded_input = (char *)malloc(input_len + BLOCK_SIZE_BYTES);  // Ensure space for padding
     if (!padded_input) {
         //TODO add actual error
@@ -127,9 +140,8 @@ void encrypt_text(const char * Mode_of_operation, const char *input_text, char *
     }
     free(padded_input);
 }
-void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t input_len, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+AES_API void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t input_len, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     size_t unpadded_len = 0;
-    (void)iv;  //TODO remove after implementing cbc , just for mute warning
     if (strcmp(Mode_of_operation, "ECB") == 0) {
         decrypt_text_ECB(input_text, output_text, key, key_size, input_len);
     } 
@@ -149,7 +161,7 @@ void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t
 
     remove_pkcs7_padding(output_text, input_len, &unpadded_len); // handle the removal of the padding and adding null terminator
 }
-void encrypt_file(const char * Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+AES_API void encrypt_file(const char * Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     
     FILE *input_file = fopen(input_file_path, "rb");
     if (!input_file) {
@@ -183,7 +195,7 @@ void encrypt_file(const char * Mode_of_operation, const char *input_file_path, c
     fclose(input_file);
     fclose(output_file);
 }
-void decrypt_file(const char *Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
+AES_API void decrypt_file(const char  *Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     FILE *input_file = fopen(input_file_path, "rb");
     if (!input_file) {
         perror("Failed to open input file");
@@ -259,7 +271,7 @@ void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *k
     for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES) {
         // Convert the current 16-byte block to AES state
         stringToState(input_text + i, buffer_current_state);
-        //xor the previus state with the current in order to implement CBC
+        //xor the previous state with the current in order to implement CBC
         xor_state_state(buffer_current_state, buffer_previous_state);
         // Encrypt the block using the Cipher function
         Cipher(buffer_current_state, key, key_size);
@@ -293,7 +305,6 @@ void encrypt_text_CFB(const char *input_text, char *output_text, const uint8_t *
         memcpy(shift_register, &output_text[i], segment_len);
     }
 }
-
 void decrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len) {
     state_t buffer_State;
     for (size_t i = 0; i < input_len; i += BLOCK_SIZE_BYTES)
@@ -312,12 +323,12 @@ void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *
     state_t buffer_previous_state;
     for (size_t i = input_len - BLOCK_SIZE_BYTES ; i > BLOCK_SIZE_BYTES; i -= BLOCK_SIZE_BYTES)
     {
-        // Convert the current and previus 16-byte block to AES state
+        // Convert the current and previous 16-byte block to AES state
         stringToState(input_text + i - BLOCK_SIZE_BYTES, buffer_previous_state);
         stringToState(input_text + i, buffer_current_state);
         // Decrypt the block using the InvCipher function
         InvCipher(buffer_current_state, key, key_size);
-        //xor the previus state with the current in order to implement CBC
+        //xor the previous state with the current in order to implement CBC
         xor_state_state(buffer_current_state, buffer_previous_state);
         // Convert the decrypted state back to string format
         stateToString(buffer_current_state, output_text + i);
@@ -353,7 +364,6 @@ void decrypt_text_CFB(const char *input_text, char *output_text, const uint8_t *
         memcpy(shift_register, &input_text[i], segment_len);
     }
 }
-
 void encrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     uint8_t buffer[BLOCK_SIZE_BYTES];
     uint8_t encrypted_buffer[BLOCK_SIZE_BYTES];
@@ -448,7 +458,6 @@ void encrypt_file_CFB(FILE *input_file, FILE *output_file, const uint8_t *key, c
         memcpy(shift_register, ciphertext, bytes_read);
     }
 }
-
 size_t decrypt_file_ECB(FILE *input_file, FILE *output_file, const uint8_t *key, const size_t key_size, const uint8_t *iv) {
     uint8_t buffer[BLOCK_SIZE_BYTES];
     uint8_t decrypted_buffer[BLOCK_SIZE_BYTES];
@@ -998,11 +1007,41 @@ void remove_pkcs7_padding(char *input, int input_len, size_t *unpadded_len) {
     return;
 }
 void xor_state_state(state_t state_primary, const state_t state) {
-    for (int i = 0; i < state_col_len; i++) {
-        for (int j = 0; j < state_row_len; j++) {
-            memcpy(state_primary[i][j] , state_primary[i][j]^state[i][j], sizeof(uint8_t));
+    for (size_t i = 0; i < state_col_len; i++) {
+        for (size_t j = 0; j < state_row_len; j++) {
+            state_primary[i][j] ^= state[i][j];
         }
-        
     }
 }
+
+int get_random_bytes(uint8_t *buffer, size_t length) {
+    #ifdef _WIN32
+        HCRYPTPROV hProv = 0;
+        if (!CryptAcquireContext(&hProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)) {
+            printf("Error: CryptAcquireContext failed.\n");
+            return 0;
+        }
+        if (!CryptGenRandom(hProv, (DWORD)length, buffer)) {
+            printf("Error: CryptGenRandom failed.\n");
+            CryptReleaseContext(hProv, 0);
+            return 0;
+        }
+        CryptReleaseContext(hProv, 0);
+        return 1;
+    #else
+        int fd = open("/dev/urandom", O_RDONLY);
+        if (fd < 0) {
+            perror("Error opening /dev/urandom");
+            return 0;
+        }
+        ssize_t read_bytes = read(fd, buffer, length);
+        close(fd);
+        if (read_bytes != (ssize_t)length) {
+            printf("Error: Did not read required number of bytes.\n");
+            return 0;
+        }
+        return 1;
+    #endif
+}
+
 #pragma endregion

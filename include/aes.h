@@ -4,6 +4,18 @@
 #pragma region ---------- PreProcessor and typedef ----------
 #include <stdint.h>
 
+#ifdef _WIN32
+    // When building the DLL, define BUILDING_AES_DLL via your compiler options.
+    #ifdef BUILDING_AES_DLL
+        #define AES_API __declspec(dllexport)
+    #else
+        #define AES_API __declspec(dllimport)
+    #endif
+#else
+    // On non-Windows platforms
+    #define AES_API
+#endif
+
 // AES Constants
 #define BLOCK_SIZE_BYTES 16  // Block size in bytes
 #define KEY_SIZE_BYTES_128 16 // Key size in bytes for AES-128
@@ -26,22 +38,21 @@ extern const uint8_t mix_matrix[4][4];
 #pragma endregion
 #pragma region ---------- Public Functions (DLL Main Functions) ----------
 // Public Functions (DLL Main Functions)
-void create_key(uint8_t *key, size_t key_size);
-void create_iv(uint8_t *key);
+AES_API void create_key(uint8_t *key, size_t key_size);
+AES_API void create_iv(uint8_t *key);
 
 // void encrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC  or without iv: ECB CTR
-void encrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, size_t *output_len, const uint8_t *key, const size_t key_size, const uint8_t *iv);//Accepts CBC CFB OFB PCBC  without iv: ECB CTR
-void decrypt_text(const char * Mode_of_operation, const char *input_text, size_t input_len, char *output_text, const uint8_t *key, const size_t key_size, const uint8_t *iv);
-void encrypt_file(const char * Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv);
-void decrypt_file(const char *Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv);
-// void decrypt_file(const char * Mode_of_operation, const char *file_path, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
-// void decrypt_text(const char * Mode_of_operation, const char *input_text, char *output_text, const uint8_t *key, const uint8_t *iv); //Accepts CBC CFB OFB PCBC without iv: ECB CTR
+AES_API void encrypt_text(const char* Mode_of_operation, const char* input_text, char* output_text, size_t* output_len, const uint8_t* key, const size_t key_size, const uint8_t* iv);//Accepts CBC CFB OFB PCBC  without iv: ECB CTR
+AES_API void decrypt_text(const char* Mode_of_operation, const char* input_text, size_t input_len, char* output_text, const uint8_t* key, const size_t key_size, const uint8_t* iv);
+AES_API void encrypt_file(const char* Mode_of_operation, const char* input_file_path, const char* output_file_path, const uint8_t* key, const size_t key_size, const uint8_t* iv);
+AES_API void decrypt_file(const char *Mode_of_operation, const char *input_file_path, const char *output_file_path, const uint8_t *key, const size_t key_size, const uint8_t *iv);
+
 #pragma endregion
 #pragma region ---------- Modes of operations Functions ----------
 void encrypt_text_ECB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, size_t input_len);
 void encrypt_text_CBC(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 void encrypt_text_CFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
-void encrypt_text_OFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
+// void encrypt_text_OFB(const char *input_text,char * output_text,const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);
 
 void decrypt_text_ECB(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, size_t input_len);
 void decrypt_text_CBC(const char *input_text, char *output_text, const uint8_t *key, size_t key_size, const uint8_t *iv, size_t input_len);

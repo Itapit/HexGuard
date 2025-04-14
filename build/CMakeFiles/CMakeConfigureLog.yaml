@@ -7,7 +7,7 @@ events:
       - "C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeDetermineSystem.cmake:205 (message)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      The system is: Windows - 10.0.17763 - AMD64
+      The system is: Windows - 10.0.19045 - AMD64
   -
     kind: "message-v1"
     backtrace:
@@ -23,36 +23,35 @@ events:
       
       The output was:
       0
-      Microsoft (R) Build Engine version 16.8.2+25e4d540b for .NET Framework
-      Copyright (C) Microsoft Corporation. All rights reserved.
+      MSBuild version 17.6.3+07e294721 for .NET Framework
+      Build started 14/04/2025 15:52:48.
       
-      Build started 22/01/2025 09:09:39.
-      Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
+      Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Creating directory "Debug\\CompilerIdC.tlog\\".
       InitializeBuildStatus:
         Creating "Debug\\CompilerIdC.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
       ClCompile:
-        C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc142.pdb" /Gd /TC /FC /errorReport:queue CMakeCCompilerId.c
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc143.pdb" /external:W0 /Gd /TC /FC /errorReport:queue CMakeCCompilerId.c
         CMakeCCompilerId.c
       Link:
-        C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
-        CompilerIdC.vcxproj -> C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.exe
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdC.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdC.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdC.lib" /MACHINE:X64 Debug\\CMakeCCompilerId.obj
+        CompilerIdC.vcxproj -> C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.exe
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_C_COMPILER=%%~$PATH:i
         :VCEnd
-        CMAKE_C_COMPILER=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\cl.exe
+        CMAKE_C_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdC.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdC.tlog\\CompilerIdC.lastbuildstate".
-      Done Building Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
+      Done Building Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdC\\CompilerIdC.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:01.00
+      Time Elapsed 00:00:00.53
       
       
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.exe"
@@ -60,7 +59,7 @@ events:
       Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CompilerIdC.vcxproj"
       
       The C compiler identification is MSVC, found in:
-        C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/3.31.4/CompilerIdC/CompilerIdC.exe
+        C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/3.31.4/CompilerIdC/CompilerIdC.exe
       
   -
     kind: "message-v1"
@@ -77,36 +76,35 @@ events:
       
       The output was:
       0
-      Microsoft (R) Build Engine version 16.8.2+25e4d540b for .NET Framework
-      Copyright (C) Microsoft Corporation. All rights reserved.
+      MSBuild version 17.6.3+07e294721 for .NET Framework
+      Build started 14/04/2025 15:52:49.
       
-      Build started 22/01/2025 09:09:40.
-      Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
+      Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.vcxproj" on node 1 (default targets).
       PrepareForBuild:
         Creating directory "Debug\\".
         Creating directory "Debug\\CompilerIdCXX.tlog\\".
       InitializeBuildStatus:
         Creating "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
       ClCompile:
-        C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc142.pdb" /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\CL.exe /c /nologo /W0 /WX- /diagnostics:column /Od /D _MBCS /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\\\" /Fd"Debug\\vc143.pdb" /external:W0 /Gd /TP /FC /errorReport:queue CMakeCXXCompilerId.cpp
         CMakeCXXCompilerId.cpp
       Link:
-        C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
-        CompilerIdCXX.vcxproj -> C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.exe
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:".\\CompilerIdCXX.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\\CompilerIdCXX.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\\CompilerIdCXX.lib" /MACHINE:X64 Debug\\CMakeCXXCompilerId.obj
+        CompilerIdCXX.vcxproj -> C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.exe
       PostBuildEvent:
         for %%i in (cl.exe) do @echo CMAKE_CXX_COMPILER=%%~$PATH:i
         :VCEnd
-        CMAKE_CXX_COMPILER=C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\Hostx64\\x64\\cl.exe
+        CMAKE_CXX_COMPILER=C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\Hostx64\\x64\\cl.exe
       FinalizeBuildStatus:
         Deleting file "Debug\\CompilerIdCXX.tlog\\unsuccessfulbuild".
         Touching "Debug\\CompilerIdCXX.tlog\\CompilerIdCXX.lastbuildstate".
-      Done Building Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
+      Done Building Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\3.31.4\\CompilerIdCXX\\CompilerIdCXX.vcxproj" (default targets).
       
       Build succeeded.
           0 Warning(s)
           0 Error(s)
       
-      Time Elapsed 00:00:00.61
+      Time Elapsed 00:00:00.48
       
       
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.exe"
@@ -114,7 +112,7 @@ events:
       Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CompilerIdCXX.vcxproj"
       
       The CXX compiler identification is MSVC, found in:
-        C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/3.31.4/CompilerIdCXX/CompilerIdCXX.exe
+        C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/3.31.4/CompilerIdCXX/CompilerIdCXX.exe
       
   -
     kind: "try_compile-v1"
@@ -125,8 +123,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-8zurbc"
-      binary: "C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-8zurbc"
+      source: "C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u212wc"
+      binary: "C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u212wc"
     cmakeVariables:
       CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
       CMAKE_C_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -135,39 +133,38 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-8zurbc'
+        Change Dir: 'C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u212wc'
         
-        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/MSBuild/Current/Bin/MSBuild.exe" cmTC_a1200.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
-        Microsoft (R) Build Engine version 16.8.2+25e4d540b for .NET Framework
-        Copyright (C) Microsoft Corporation. All rights reserved.
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_702af.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.6.3+07e294721 for .NET Framework
+        Build started 14/04/2025 15:52:49.
         
-        Build started 22/01/2025 09:09:41.
-        Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-8zurbc\\cmTC_a1200.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u212wc\\cmTC_702af.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_a1200.dir\\Debug\\".
-          Creating directory "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-8zurbc\\Debug\\".
-          Creating directory "cmTC_a1200.dir\\Debug\\cmTC_a1200.tlog\\".
+          Creating directory "cmTC_702af.dir\\Debug\\".
+          Creating directory "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u212wc\\Debug\\".
+          Creating directory "cmTC_702af.dir\\Debug\\cmTC_702af.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_a1200.dir\\Debug\\cmTC_a1200.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Creating "cmTC_702af.dir\\Debug\\cmTC_702af.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
         ClCompile:
-          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_a1200.dir\\Debug\\\\" /Fd"cmTC_a1200.dir\\Debug\\vc142.pdb" /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
-          Microsoft (R) C/C++ Optimizing Compiler Version 19.28.29334 for x64
-          Copyright (C) Microsoft Corporation.  All rights reserved.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_702af.dir\\Debug\\\\" /Fd"cmTC_702af.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.36.32535 for x64
           CMakeCCompilerABI.c
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_a1200.dir\\Debug\\\\" /Fd"cmTC_a1200.dir\\Debug\\vc142.pdb" /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_702af.dir\\Debug\\\\" /Fd"cmTC_702af.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TC /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCCompilerABI.c"
         Link:
-          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-8zurbc\\Debug\\cmTC_a1200.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-8zurbc/Debug/cmTC_a1200.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-8zurbc/Debug/cmTC_a1200.lib" /MACHINE:X64  /machine:x64 cmTC_a1200.dir\\Debug\\CMakeCCompilerABI.obj
-          cmTC_a1200.vcxproj -> C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-8zurbc\\Debug\\cmTC_a1200.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u212wc\\Debug\\cmTC_702af.exe" /INCREMENTAL /ILK:"cmTC_702af.dir\\Debug\\cmTC_702af.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u212wc/Debug/cmTC_702af.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u212wc/Debug/cmTC_702af.lib" /MACHINE:X64  /machine:x64 cmTC_702af.dir\\Debug\\CMakeCCompilerABI.obj
+          cmTC_702af.vcxproj -> C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u212wc\\Debug\\cmTC_702af.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_a1200.dir\\Debug\\cmTC_a1200.tlog\\unsuccessfulbuild".
-          Touching "cmTC_a1200.dir\\Debug\\cmTC_a1200.tlog\\cmTC_a1200.lastbuildstate".
-        Done Building Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-8zurbc\\cmTC_a1200.vcxproj" (default targets).
+          Deleting file "cmTC_702af.dir\\Debug\\cmTC_702af.tlog\\unsuccessfulbuild".
+          Touching "cmTC_702af.dir\\Debug\\cmTC_702af.tlog\\cmTC_702af.lastbuildstate".
+        Done Building Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u212wc\\cmTC_702af.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.57
+        Time Elapsed 00:00:00.47
         
       exitCode: 0
   -
@@ -180,7 +177,7 @@ events:
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        linker tool for 'C': C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.28.29333/bin/HostX64/x64/link.exe
+        linker tool for 'C': C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/HostX64/x64/link.exe
         implicit libs: []
         implicit objs: []
         implicit dirs: []
@@ -195,8 +192,8 @@ events:
       - "C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      Running the C compiler's linker: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.28.29333/bin/HostX64/x64/link.exe" "-v"
-      Microsoft (R) Incremental Linker Version 14.28.29334.0
+      Running the C compiler's linker: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.36.32535.0
       Copyright (C) Microsoft Corporation.  All rights reserved.
   -
     kind: "try_compile-v1"
@@ -207,8 +204,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-v0ugkk"
-      binary: "C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-v0ugkk"
+      source: "C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u4obi8"
+      binary: "C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u4obi8"
     cmakeVariables:
       CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
       CMAKE_CXX_FLAGS_DEBUG: "/Ob0 /Od /RTC1"
@@ -218,39 +215,38 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: 'C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-v0ugkk'
+        Change Dir: 'C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u4obi8'
         
-        Run Build Command(s): "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/MSBuild/Current/Bin/MSBuild.exe" cmTC_0efea.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=16.0 /v:n
-        Microsoft (R) Build Engine version 16.8.2+25e4d540b for .NET Framework
-        Copyright (C) Microsoft Corporation. All rights reserved.
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/amd64/MSBuild.exe" cmTC_3b8ce.vcxproj /p:Configuration=Debug /p:Platform=x64 /p:VisualStudioVersion=17.0 /v:n
+        MSBuild version 17.6.3+07e294721 for .NET Framework
+        Build started 14/04/2025 15:52:50.
         
-        Build started 22/01/2025 09:09:42.
-        Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-v0ugkk\\cmTC_0efea.vcxproj" on node 1 (default targets).
+        Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4obi8\\cmTC_3b8ce.vcxproj" on node 1 (default targets).
         PrepareForBuild:
-          Creating directory "cmTC_0efea.dir\\Debug\\".
-          Creating directory "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-v0ugkk\\Debug\\".
-          Creating directory "cmTC_0efea.dir\\Debug\\cmTC_0efea.tlog\\".
+          Creating directory "cmTC_3b8ce.dir\\Debug\\".
+          Creating directory "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4obi8\\Debug\\".
+          Creating directory "cmTC_3b8ce.dir\\Debug\\cmTC_3b8ce.tlog\\".
         InitializeBuildStatus:
-          Creating "cmTC_0efea.dir\\Debug\\cmTC_0efea.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
+          Creating "cmTC_3b8ce.dir\\Debug\\cmTC_3b8ce.tlog\\unsuccessfulbuild" because "AlwaysCreate" was specified.
         ClCompile:
-          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_0efea.dir\\Debug\\\\" /Fd"cmTC_0efea.dir\\Debug\\vc142.pdb" /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
-          Microsoft (R) C/C++ Optimizing Compiler Version 19.28.29334 for x64
-          Copyright (C) Microsoft Corporation.  All rights reserved.
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\CL.exe /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_3b8ce.dir\\Debug\\\\" /Fd"cmTC_3b8ce.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
+          Microsoft (R) C/C++ Optimizing Compiler Version 19.36.32535 for x64
           CMakeCXXCompilerABI.cpp
-          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_0efea.dir\\Debug\\\\" /Fd"cmTC_0efea.dir\\Debug\\vc142.pdb" /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
+          Copyright (C) Microsoft Corporation.  All rights reserved.
+          cl /c /Zi /W1 /WX- /diagnostics:column /Od /Ob0 /D _MBCS /D WIN32 /D _WINDOWS /D "CMAKE_INTDIR=\\"Debug\\"" /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"cmTC_3b8ce.dir\\Debug\\\\" /Fd"cmTC_3b8ce.dir\\Debug\\vc143.pdb" /external:W1 /Gd /TP /errorReport:queue "C:\\Program Files\\CMake\\share\\cmake-3.31\\Modules\\CMakeCXXCompilerABI.cpp"
         Link:
-          C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Professional\\VC\\Tools\\MSVC\\14.28.29333\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-v0ugkk\\Debug\\cmTC_0efea.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG:FASTLINK /PDB:"C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-v0ugkk/Debug/cmTC_0efea.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-v0ugkk/Debug/cmTC_0efea.lib" /MACHINE:X64  /machine:x64 cmTC_0efea.dir\\Debug\\CMakeCXXCompilerABI.obj
-          cmTC_0efea.vcxproj -> C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-v0ugkk\\Debug\\cmTC_0efea.exe
+          C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.36.32532\\bin\\HostX64\\x64\\link.exe /ERRORREPORT:QUEUE /OUT:"C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4obi8\\Debug\\cmTC_3b8ce.exe" /INCREMENTAL /ILK:"cmTC_3b8ce.dir\\Debug\\cmTC_3b8ce.ilk" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u4obi8/Debug/cmTC_3b8ce.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/CMakeScratch/TryCompile-u4obi8/Debug/cmTC_3b8ce.lib" /MACHINE:X64  /machine:x64 cmTC_3b8ce.dir\\Debug\\CMakeCXXCompilerABI.obj
+          cmTC_3b8ce.vcxproj -> C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4obi8\\Debug\\cmTC_3b8ce.exe
         FinalizeBuildStatus:
-          Deleting file "cmTC_0efea.dir\\Debug\\cmTC_0efea.tlog\\unsuccessfulbuild".
-          Touching "cmTC_0efea.dir\\Debug\\cmTC_0efea.tlog\\cmTC_0efea.lastbuildstate".
-        Done Building Project "C:\\Users\\Administrator\\Documents\\GitHub\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-v0ugkk\\cmTC_0efea.vcxproj" (default targets).
+          Deleting file "cmTC_3b8ce.dir\\Debug\\cmTC_3b8ce.tlog\\unsuccessfulbuild".
+          Touching "cmTC_3b8ce.dir\\Debug\\cmTC_3b8ce.tlog\\cmTC_3b8ce.lastbuildstate".
+        Done Building Project "C:\\Users\\Itamar\\Desktop\\GithubRep\\HexGuard\\build\\CMakeFiles\\CMakeScratch\\TryCompile-u4obi8\\cmTC_3b8ce.vcxproj" (default targets).
         
         Build succeeded.
             0 Warning(s)
             0 Error(s)
         
-        Time Elapsed 00:00:00.55
+        Time Elapsed 00:00:00.43
         
       exitCode: 0
   -
@@ -263,7 +259,7 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
-        linker tool for 'CXX': C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.28.29333/bin/HostX64/x64/link.exe
+        linker tool for 'CXX': C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/HostX64/x64/link.exe
         implicit libs: []
         implicit objs: []
         implicit dirs: []
@@ -278,7 +274,7 @@ events:
       - "C:/Program Files/CMake/share/cmake-3.31/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
       - "CMakeLists.txt:2 (project)"
     message: |
-      Running the CXX compiler's linker: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Professional/VC/Tools/MSVC/14.28.29333/bin/HostX64/x64/link.exe" "-v"
-      Microsoft (R) Incremental Linker Version 14.28.29334.0
+      Running the CXX compiler's linker: "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/HostX64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.36.32535.0
       Copyright (C) Microsoft Corporation.  All rights reserved.
 ...

@@ -1,23 +1,59 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-      {
-        "label": "Build with CMake",
-        "type": "shell",
-        "command": "cmake",
-        "args": [
-          "--build",
-          "."
-        ],
-        "options": {
-          "cwd": "${workspaceFolder}/build"
-        },
-        "group": {
-          "kind": "build",
-          "isDefault": true
-        },
-        "problemMatcher": []
-      }
-    ]
-  }
-  
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Configure DLL Build",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S", "${workspaceFolder}",
+        "-B", "${workspaceFolder}/build",
+        "-DBUILD_DLL=ON"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build DLL Compound",
+      "dependsOn": [
+        "Configure DLL Build"
+      ],
+      "type": "shell",
+      "command": "cmake --build ${workspaceFolder}/build",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "problemMatcher": [],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "Configure Test Run",
+      "type": "shell",
+      "command": "cmake",
+      "args": [
+        "-S", "${workspaceFolder}",
+        "-B", "${workspaceFolder}/build",
+        "-DBUILD_DLL=OFF"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Build Test Compound",
+      "dependsOn": [
+        "Configure Test Run"
+      ],
+      "type": "shell",
+      "command": "cmake --build ${workspaceFolder}/build",
+      "options": {
+        "cwd": "${workspaceFolder}/build"
+      },
+      "problemMatcher": [],
+      "dependsOrder": "sequence"
+    }
+  ]
+}

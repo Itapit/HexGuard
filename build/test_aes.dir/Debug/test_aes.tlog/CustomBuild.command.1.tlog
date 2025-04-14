@@ -1,6 +1,6 @@
-^C:\USERS\ADMINISTRATOR\DOCUMENTS\GITHUB\HEXGUARD\CMAKELISTS.TXT
+^C:\USERS\ITAMAR\DESKTOP\GITHUBREP\HEXGUARD\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Administrator/Documents/GitHub/HexGuard -BC:/Users/Administrator/Documents/GitHub/HexGuard/build --check-stamp-file C:/Users/Administrator/Documents/GitHub/HexGuard/build/CMakeFiles/generate.stamp
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/Itamar/Desktop/GithubRep/HexGuard -BC:/Users/Itamar/Desktop/GithubRep/HexGuard/build --check-stamp-file C:/Users/Itamar/Desktop/GithubRep/HexGuard/build/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

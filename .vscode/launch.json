@@ -9,7 +9,7 @@
         "args": [],
         "cwd": "${workspaceFolder}/build/bin/Debug",
         "stopAtEntry": false,
-        "preLaunchTask": "Build with CMake"
+        "preLaunchTask": "Build Test Compound"
       }
     ]
   }

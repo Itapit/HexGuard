@@ -3,16 +3,20 @@ project(hexguard_aes)
 set(CMAKE_CXX_COMPILER_ID "gcc")
 message("Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
 message("Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
+
 # Set C standard
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
+# Option to build as a DLL (shared library) or a static library.
+option(BUILD_DLL "Build AES as a DLL" OFF)
 
-
-# Create AES library
-add_library(aes
-    lib/aes.c
-)
+if(BUILD_DLL)
+    add_library(aes SHARED lib/aes.c)
+    target_compile_definitions(aes PUBLIC BUILDING_AES_DLL)
+else()
+    add_library(aes STATIC lib/aes.c)
+endif()
 
 # Set include directories for the library
 target_include_directories(aes
@@ -20,21 +24,29 @@ target_include_directories(aes
         ${CMAKE_SOURCE_DIR}/include
 )
 
-# Create test executable
-add_executable(test_aes
-    test_aes.c
-)
+# On Windows, if building as a DLL, link against the Windows crypto library.
+if(WIN32 AND BUILD_DLL)
+    target_link_libraries(aes PUBLIC Advapi32)
+endif()
 
-# Link test executable with AES library
-target_link_libraries(test_aes
-    PRIVATE
-        aes
-)
+if(NOT BUILD_DLL)
+    # Create test executable
+    add_executable(test_aes test_aes.c)
+    target_link_libraries(test_aes PRIVATE aes)
+endif()
 
-# Set output directories
-set_target_properties(test_aes aes
+# Set output directories for aes unconditionally.
+set_target_properties(aes
     PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
+
+# Set output directories for test_aes only if the target exists.
+if(NOT BUILD_DLL)
+    set_target_properties(test_aes
+        PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+endif()
