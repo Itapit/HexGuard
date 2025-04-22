@@ -178,6 +178,10 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <Project>{01930C71-96BB-3C83-84F9-F83A60159FCB}</Project>
       <Name>aes</Name>
     </ProjectReference>
+    <ProjectReference Include="C:\Users\Itamar\Desktop\GithubRep\HexGuard\build\test_aes.vcxproj">
+      <Project>{AD7CDB2C-223F-300B-9FF1-E02E638ADF58}</Project>
+      <Name>test_aes</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

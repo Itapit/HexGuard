@@ -15,7 +15,7 @@
 ########################
 
 //Build AES as a DLL
-BUILD_DLL:BOOL=ON
+BUILD_DLL:BOOL=OFF
 
 //Path to a program.
 CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.36.32532/bin/Hostx64/x64/lib.exe

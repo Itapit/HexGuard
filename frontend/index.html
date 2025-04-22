@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HexGuard Web</title>
+  <style>
+    body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; }
+    input, select, textarea { width: 100%; margin: 10px 0; padding: 8px; }
+    button { padding: 10px 15px; }
+    .section { border: 1px solid #ccc; padding: 15px; margin-top: 20px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h1>HexGuard 🔒</h1>
+
+  <!-- TEXT ENCRYPTION -->
+  <div class="section">
+    <h2>Text Encryption</h2>
+    <select id="text-mode">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
+    <select id="text-key-size">
+      <option value="128">128-bit</option>
+      <option value="192">192-bit</option>
+      <option value="256">256-bit</option>
+    </select>
+    <input id="text-key" placeholder="Key (hex)" />
+    <input id="text-iv" placeholder="IV (hex)" />
+    <button onclick="generateKeyIv('text')">Generate Key & IV</button>
+    <textarea id="text-input" rows="4" placeholder="Text to encrypt"></textarea>
+    <button onclick="encryptText()">Encrypt</button>
+    <pre id="encrypt-output"></pre>
+  </div>
+
+  <!-- TEXT DECRYPTION -->
+  <div class="section">
+    <h2>Text Decryption</h2>
+    <select id="text-mode-dec">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
+    <select id="text-dec-key-size">
+      <option value="128">128-bit</option>
+      <option value="192">192-bit</option>
+      <option value="256">256-bit</option>
+    </select>
+    <input id="text-dec-key" placeholder="Key (hex)" />
+    <input id="text-dec-iv" placeholder="IV (hex)" />
+    <button onclick="generateKeyIv('text-dec')">Generate Key & IV</button>
+    <textarea id="text-input-dec" rows="4" placeholder="Ciphertext to decrypt"></textarea>
+    <button onclick="decryptText()">Decrypt</button>
+    <pre id="decrypt-output"></pre>
+  </div>
+  
+  <!-- FILE ENCRYPTION -->
+  <div class="section">
+    <h2>File Encryption</h2>
+    <select id="file-mode">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
+    <select id="file-key-size">
+      <option value="128">128-bit</option>
+      <option value="192">192-bit</option>
+      <option value="256">256-bit</option>
+    </select>
+    <input id="file-key" placeholder="Key (hex)" />
+    <input id="file-iv" placeholder="IV (hex)" />
+    <button onclick="generateKeyIv('file')">Generate Key & IV</button>
+    <input id="file-input" type="file" />
+    <button onclick="encryptFile()">Encrypt & Download</button>
+  </div>
+
+<!-- FILE DECRYPTION -->
+<div class="section">
+    <h2>File Decryption</h2>
+    <select id="file-mode-dec">
+      <option value="ECB">ECB</option>
+      <option value="CBC">CBC</option>
+      <option value="CFB">CFB</option>
+    </select>
+    <select id="file-dec-key-size">
+      <option value="128">128-bit</option>
+      <option value="192">192-bit</option>
+      <option value="256">256-bit</option>
+    </select>
+    <input id="file-dec-key" placeholder="Key (hex)" />
+    <input id="file-dec-iv" placeholder="IV (hex)" />
+    <button onclick="generateKeyIv('file-dec')">Generate Key & IV</button>
+    <input id="file-input-dec" type="file" />
+    <button onclick="decryptFile()">Decrypt & Download</button>
+  </div>
+  
+
+  <script>
+    async function generateKeyIv(prefix) {
+      try {
+        const sizeDropdown = document.getElementById(`${prefix}-key-size`);
+        const bits = sizeDropdown ? parseInt(sizeDropdown.value) : 128;
+
+        const [keyRes, ivRes] = await Promise.all([
+          fetch(`/generate-key?bits=${bits}`),
+          fetch('/generate-iv')
+        ]);
+
+        const keyData = await keyRes.json();
+        const ivData = await ivRes.json();
+
+        document.getElementById(`${prefix}-key`).value = keyData.key;
+        document.getElementById(`${prefix}-iv`).value = ivData.iv;
+      } catch (err) {
+        alert("Failed to generate key or IV from backend.");
+      }
+    }
+
+    async function encryptText() {
+      const res = await fetch('/encrypt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: document.getElementById('text-mode').value,
+          key: document.getElementById('text-key').value,
+          iv: document.getElementById('text-iv').value,
+          text: document.getElementById('text-input').value
+        })
+      });
+
+      const data = await res.json();
+      document.getElementById('encrypt-output').innerText = data.ciphertext || data.error;
+    }
+
+    async function decryptText() {
+        const mode = document.getElementById('text-mode-dec').value;
+        const key = document.getElementById('text-dec-key').value;
+        const iv = document.getElementById('text-dec-iv').value;
+        const ciphertext = document.getElementById('text-input-dec').value;
+
+        const res = await fetch('/decrypt', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+            mode,
+            key,
+            iv,
+            text: ciphertext
+            })
+        });
+
+        const data = await res.json();
+        document.getElementById('decrypt-output').innerText = data.plaintext || data.error;
+}
+
+    async function encryptFile() {
+      const formData = new FormData();
+      formData.append('mode', document.getElementById('file-mode').value);
+      formData.append('key', document.getElementById('file-key').value);
+      formData.append('iv', document.getElementById('file-iv').value);
+      formData.append('file', document.getElementById('file-input').files[0]);
+      
+      console.log("[encryptFile] Triggered");
+
+      const key = document.getElementById('file-key').value;
+      const iv = document.getElementById('file-iv').value;    
+      console.log("[encryptFile] Sending key:", key);
+      console.log("[encryptFile] Sending iv:", iv);
+
+      const res = await fetch('/encrypt-file', { method: 'POST', body: formData });
+
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'encrypted_output.enc';
+
+        if (!window.encryptionDownloadTriggered) {
+            window.encryptionDownloadTriggered = true;
+            a.click();
+            setTimeout(() => window.encryptionDownloadTriggered = false, 3000);
+        }           
+      } else alert('File encryption failed.');
+    }
+
+    async function decryptFile() {
+        const formData = new FormData();
+        formData.append('mode', document.getElementById('file-mode-dec').value);
+        formData.append('key', document.getElementById('file-dec-key').value);
+        formData.append('iv', document.getElementById('file-dec-iv').value);
+        formData.append('file', document.getElementById('file-input-dec').files[0]);
+        console.log("[decryptFile] Decrypting now...");
+        const res = await fetch('/decrypt-file', { method: 'POST', body: formData });
+
+        if (res.ok) {
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'decrypted_output.txt';
+            a.click();
+        } 
+        else {
+            alert('File decryption failed.');
+        }
+}
+
+  </script>
+</body>
+</html>
