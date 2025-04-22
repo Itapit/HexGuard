@@ -31,13 +31,10 @@ def encrypt_text_endpoint(req: TextCryptoRequest):
         result = encrypt_text(req.mode, req.text, key_bytes, iv_bytes, key_size)
         return {"ciphertext": result}
 
-    except ValueError as ve:
-        print(f"[ENCRYPT] ValueError: {ve}")
-        raise HTTPException(status_code=400, detail=f"Invalid hex in key/IV or text: {ve}")
 
     except Exception as e:
-        print(f"[ENCRYPT] Exception: {e}")
-        raise HTTPException(status_code=500, detail=f"Encryption failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=map_error(str(e), "Encryption"))
+
 
 
 @router.post("/decrypt")
@@ -61,9 +58,7 @@ def decrypt_text_endpoint(req: TextCryptoRequest):
         return {"plaintext": result}
 
     except Exception as e:
-        print(f"[DECRYPT ERROR] {e}")
-        raise HTTPException(status_code=400, detail=str(e))
-
+        raise HTTPException(status_code=400, detail=map_error(str(e), "Decryption"))
 
 
 
@@ -95,11 +90,12 @@ async def encrypt_file_endpoint(
 
         encrypt_file(mode, temp_input_path, temp_output_path, key_bytes, key_bits, iv_bytes)
 
-        return FileResponse(temp_output_path, media_type="application/octet-stream", filename=f"{file.filename}.enc")
+        original_name, ext = os.path.splitext(file.filename)
+        new_name = f"{original_name}_encrypted{ext}"
+        return FileResponse(temp_output_path, media_type="application/octet-stream", filename=new_name)
 
     except Exception as e:
-        print(f"[FILE ENCRYPT ERROR] {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=400, detail=map_error(str(e), "File encryption"))
 
 
 @router.post("/decrypt-file")
@@ -109,21 +105,31 @@ def decrypt_uploaded_file(
     iv: str = Form(...),
     file: UploadFile = File(...)
 ):
-    print("[FILE DECRYPT] Starting decryption...")
-    key_bytes = bytes.fromhex(key)
-    key_size = len(key_bytes) * 8
-    iv_bytes = bytes.fromhex(iv)
-    with tempfile.NamedTemporaryFile(delete=False) as input_tmp:
-        input_tmp.write(file.file.read())
-        input_path = input_tmp.name
-
-    output_path = input_path + ".dec"
-
+    input_path = None 
     try:
+        key_bytes = bytes.fromhex(key)
+        key_size = len(key_bytes) * 8
+        iv_bytes = bytes.fromhex(iv)
+
+        with tempfile.NamedTemporaryFile(delete=False) as input_tmp:
+            input_tmp.write(file.file.read())
+            input_path = input_tmp.name
+
+        output_path = input_path + ".dec"
         decrypt_file(mode, input_path, output_path, key_bytes, key_size, iv_bytes)
-        return FileResponse(output_path, filename=file.filename + ".dec")
+
+        original_name, ext = os.path.splitext(file.filename)
+        new_name = f"{original_name}_decrypted{ext}"
+        return FileResponse(output_path, filename=new_name)
+
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=map_error(str(e), "File decryption"))
+
     finally:
-        os.remove(input_path)
+        if input_path and os.path.exists(input_path):
+            os.remove(input_path)
+
 
 @router.get("/generate-key")
 def get_random_key(bits: int = 128):
@@ -142,3 +148,18 @@ def get_random_iv():
         return {"iv": generate_iv()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def map_error(error_message: str, context: str = "") -> str:
+    msg = error_message.lower()
+    print(msg)
+    if "invalid padding" in msg:
+        return "Invalid padding. Make sure the ciphertext, key, and IV match what was used to encrypt."
+    elif "utf-8" in msg:
+        return "Can't decrypt — check that the key and IV match what was used to encrypt."
+    elif "key length" in msg or "key size" in msg:
+        return "Invalid key size. Use 128, 192, or 256-bit keys."
+    elif "hex" in msg:
+        return "Key or IV must be a valid hex string."
+    
+    return f"{context} failed. An unexpected error occurred. Please double-check your input or try again later."

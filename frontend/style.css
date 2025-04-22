@@ -1,0 +1,556 @@
+/* START OF FILE style.css */
+
+/* Root variables for theming */
+:root {
+  /* Updated primary/secondary to green theme */
+  --primary: #4caf50; /* Changed from #4361ee */
+  --primary-hover: #45a049; /* Changed from #3a56d4 - Darker green */
+  --secondary: #388e3c; /* Changed from #3f37c9 - Another green shade */
+  --secondary-hover: #2e7d32; /* Changed from #332faa - Darker green */
+
+  /* Other theme colors remain */
+  --success: #4caf50; /* Note: Now same as primary */
+  --danger: #f44336;
+  --warning: #ff9800;
+  --info: #2196f3; /* Kept as blue */
+
+  /* Light theme */
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #212529;
+  --text-secondary: #6c757d;
+  --border: #dee2e6;
+  --input-bg: #ffffff;
+  --input-border: #ced4da;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --header-bg: #ffffff;
+  --footer-bg: #ffffff;
+}
+
+/* Dark theme variables */
+body.dark {
+  --bg: #121212;
+  --card-bg: #1e1e1e;
+  --text: #f8f9fa;
+  --text-secondary: #adb5bd;
+  --border: #343a40;
+  --input-bg: #2c2c2c;
+  --input-border: #495057;
+  --shadow: rgba(255, 255, 255, 0.05);
+  --header-bg: #1a1a1a;
+  --footer-bg: #1a1a1a;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styles */
+.app-header {
+  background: var(--header-bg);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.logo i {
+  font-size: 1.5rem;
+  color: var(--primary); /* Uses new primary color */
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+  background-color: var(--border);
+}
+
+/* Tab container */
+.tab-container {
+  padding: 1rem 2rem 0;
+  background: var(--bg);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.tab-btn:hover {
+  color: var(--primary); /* Uses new primary color */
+}
+
+.tab-btn.active {
+  color: var(--primary); /* Uses new primary color */
+  border-bottom: 3px solid var(--primary); /* Uses new primary color */
+}
+
+.tab-content {
+  display: none;
+  padding: 2rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Main content */
+main {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Card styles */
+.card {
+  background: var(--card-bg);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.card-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-header h2 i {
+  color: var(--primary); /* Uses new primary color */
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Form controls */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  color: var(--text);
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary); /* Uses new primary color */
+  /* Updated rgba to match new primary green */
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.25); /* Changed from rgba(67, 97, 238, 0.25) */
+}
+
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-button .form-control {
+  flex-grow: 1;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s, transform 0.1s;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--primary); /* Uses new primary color */
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover); /* Uses new primary hover color */
+}
+
+.btn-secondary {
+  background-color: var(--secondary); /* Uses new secondary color */
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: var(--secondary-hover); /* Uses new secondary hover color */
+}
+
+.icon-button {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.icon-button:hover {
+  background-color: var(--border);
+  color: var(--primary); /* Uses new primary color */
+}
+
+/* Output container */
+.output-container {
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.output {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: 6px;
+  padding: 1rem;
+  min-height: 80px;
+  max-height: 200px;
+  overflow-y: auto;
+  word-break: break-all;
+  font-family: monospace;
+}
+
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+body.dark .copy-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* File upload area */
+.file-input-label {
+  width: 100%;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+}
+
+.file-drop-area {
+  border: 2px dashed var(--input-border);
+  border-radius: 6px;
+  padding: 2rem 1rem;
+  text-align: center;
+  transition: border-color 0.3s, background-color 0.3s;
+  background-color: var(--input-bg);
+  color: var(--text-secondary);
+}
+
+.file-drop-area:hover, .file-drop-area.drag-over {
+  border-color: var(--primary); /* Uses new primary color */
+  /* Updated rgba to match new primary green */
+  background-color: rgba(76, 175, 80, 0.05); /* Changed from rgba(67, 97, 238, 0.05) */
+}
+
+.file-drop-area i {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  background: var(--danger); /* Unchanged */
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: none;
+  max-width: 350px;
+  animation: slideIn 0.3s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Footer */
+.app-footer {
+  background: var(--footer-bg);
+  padding: 1.5rem 2rem;
+  text-align: center;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.link-button {
+  background: none;
+  border: none;
+  color: var(--primary); /* Uses new primary color */
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  overflow: auto;
+  animation: fadeIn 0.3s;
+}
+
+.modal-content {
+  background-color: var(--card-bg);
+  margin: 10% auto;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 600px;
+  animation: scaleIn 0.3s;
+}
+
+.modal-header {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-header h3 i {
+  color: var(--primary); /* Uses new primary color */
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.tips-list {
+  list-style-type: none;
+}
+
+.tips-list li {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.tips-list li:before {
+  content: "\f30d"; /* Font Awesome icon */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  position: absolute;
+  left: 0;
+  color: var(--primary); /* Uses new primary color */
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .app-header {
+    padding: 1rem;
+  }
+
+  .tab-container, .tab-content {
+    padding: 1rem;
+  }
+
+  .card-container {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    margin: 20% auto;
+    width: 95%;
+  }
+}

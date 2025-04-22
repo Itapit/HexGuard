@@ -2,211 +2,334 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HexGuard Web</title>
-  <style>
-    body { font-family: Arial; max-width: 600px; margin: auto; padding: 20px; }
-    input, select, textarea { width: 100%; margin: 10px 0; padding: 8px; }
-    button { padding: 10px 15px; }
-    .section { border: 1px solid #ccc; padding: 15px; margin-top: 20px; border-radius: 8px; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HexGuard - Secure Encryption Tool</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <h1>HexGuard 🔒</h1>
+  <header class="app-header">
+    <div class="logo">
+      <i class="fas fa-shield-alt"></i>
+      <h1>HexGuard</h1>
+    </div>
+    <div class="header-controls">
+      <button id="theme-toggle" class="theme-toggle" aria-label="Toggle dark mode">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
+  </header>
 
-  <!-- TEXT ENCRYPTION -->
-  <div class="section">
-    <h2>Text Encryption</h2>
-    <select id="text-mode">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
-    <select id="text-key-size">
-      <option value="128">128-bit</option>
-      <option value="192">192-bit</option>
-      <option value="256">256-bit</option>
-    </select>
-    <input id="text-key" placeholder="Key (hex)" />
-    <input id="text-iv" placeholder="IV (hex)" />
-    <button onclick="generateKeyIv('text')">Generate Key & IV</button>
-    <textarea id="text-input" rows="4" placeholder="Text to encrypt"></textarea>
-    <button onclick="encryptText()">Encrypt</button>
-    <pre id="encrypt-output"></pre>
-  </div>
-
-  <!-- TEXT DECRYPTION -->
-  <div class="section">
-    <h2>Text Decryption</h2>
-    <select id="text-mode-dec">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
-    <select id="text-dec-key-size">
-      <option value="128">128-bit</option>
-      <option value="192">192-bit</option>
-      <option value="256">256-bit</option>
-    </select>
-    <input id="text-dec-key" placeholder="Key (hex)" />
-    <input id="text-dec-iv" placeholder="IV (hex)" />
-    <button onclick="generateKeyIv('text-dec')">Generate Key & IV</button>
-    <textarea id="text-input-dec" rows="4" placeholder="Ciphertext to decrypt"></textarea>
-    <button onclick="decryptText()">Decrypt</button>
-    <pre id="decrypt-output"></pre>
-  </div>
+  <div id="error-message" class="toast"></div>
   
-  <!-- FILE ENCRYPTION -->
-  <div class="section">
-    <h2>File Encryption</h2>
-    <select id="file-mode">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
-    <select id="file-key-size">
-      <option value="128">128-bit</option>
-      <option value="192">192-bit</option>
-      <option value="256">256-bit</option>
-    </select>
-    <input id="file-key" placeholder="Key (hex)" />
-    <input id="file-iv" placeholder="IV (hex)" />
-    <button onclick="generateKeyIv('file')">Generate Key & IV</button>
-    <input id="file-input" type="file" />
-    <button onclick="encryptFile()">Encrypt & Download</button>
+  <div class="tab-container">
+    <div class="tabs">
+      <button class="tab-btn active" data-target="text-section">Text</button>
+      <button class="tab-btn" data-target="file-section">Files</button>
+    </div>
   </div>
 
-<!-- FILE DECRYPTION -->
-<div class="section">
-    <h2>File Decryption</h2>
-    <select id="file-mode-dec">
-      <option value="ECB">ECB</option>
-      <option value="CBC">CBC</option>
-      <option value="CFB">CFB</option>
-    </select>
-    <select id="file-dec-key-size">
-      <option value="128">128-bit</option>
-      <option value="192">192-bit</option>
-      <option value="256">256-bit</option>
-    </select>
-    <input id="file-dec-key" placeholder="Key (hex)" />
-    <input id="file-dec-iv" placeholder="IV (hex)" />
-    <button onclick="generateKeyIv('file-dec')">Generate Key & IV</button>
-    <input id="file-input-dec" type="file" />
-    <button onclick="decryptFile()">Decrypt & Download</button>
+  <main>
+    <div id="text-section" class="tab-content active">
+      <div class="card-container">
+        <!-- TEXT ENCRYPTION -->
+        <section class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-lock"></i> Text Encryption</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="text-mode">Encryption Mode</label>
+              <select id="text-mode" class="form-control">
+                <option value="CBC">CBC (Recommended)</option>
+                <option value="CFB">CFB</option>
+                <option value="ECB">ECB (Not Recommended)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-key-size">Key Size</label>
+              <select id="text-key-size" class="form-control">
+                <option value="256">256-bit (Strongest)</option>
+                <option value="192">192-bit</option>
+                <option value="128">128-bit</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-key">Encryption Key (Hex)</label>
+              <div class="input-with-button">
+                <input id="text-key" class="form-control" placeholder="Enter or generate key" />
+                <button class="icon-button" onclick="copyToClipboard('text-key')" title="Copy key">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-iv">Initialization Vector (IV)</label>
+              <div class="input-with-button">
+                <input id="text-iv" class="form-control" placeholder="Enter or generate IV" />
+                <button class="icon-button" onclick="copyToClipboard('text-iv')" title="Copy IV">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="generateKeyIv('text')">
+              <i class="fas fa-key"></i> Generate New Key & IV
+            </button>
+            
+            <div class="form-group">
+              <label for="text-input">Text to Encrypt</label>
+              <textarea id="text-input" class="form-control" rows="4" placeholder="Enter text to encrypt"></textarea>
+            </div>
+            
+            <button class="btn btn-primary" onclick="encryptText()">
+              <i class="fas fa-lock"></i> Encrypt
+            </button>
+            
+            <div class="form-group">
+              <label for="encrypt-output">Encrypted Output</label>
+              <div class="output-container">
+                <pre id="encrypt-output" class="output"></pre>
+                <button class="icon-button copy-btn" onclick="copyToClipboard('encrypt-output')" title="Copy to clipboard">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TEXT DECRYPTION -->
+        <section class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-unlock"></i> Text Decryption</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="text-mode-dec">Decryption Mode</label>
+              <select id="text-mode-dec" class="form-control">
+                <option value="CBC">CBC (Recommended)</option>
+                <option value="CFB">CFB</option>
+                <option value="ECB">ECB (Not Recommended)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-dec-key-size">Key Size</label>
+              <select id="text-dec-key-size" class="form-control">
+                <option value="256">256-bit (Strongest)</option>
+                <option value="192">192-bit</option>
+                <option value="128">128-bit</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-dec-key">Decryption Key (Hex)</label>
+              <div class="input-with-button">
+                <input id="text-dec-key" class="form-control" placeholder="Enter or generate key" />
+                <button class="icon-button" onclick="copyToClipboard('text-dec-key')" title="Copy key">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="text-dec-iv">Initialization Vector (IV)</label>
+              <div class="input-with-button">
+                <input id="text-dec-iv" class="form-control" placeholder="Enter or generate IV" />
+                <button class="icon-button" onclick="copyToClipboard('text-dec-iv')" title="Copy IV">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="generateKeyIv('text-dec')">
+              <i class="fas fa-key"></i> Generate New Key & IV
+            </button>
+            
+            <div class="form-group">
+              <label for="text-input-dec">Text to Decrypt</label>
+              <textarea id="text-input-dec" class="form-control" rows="4" placeholder="Enter ciphertext to decrypt"></textarea>
+            </div>
+            
+            <button class="btn btn-primary" onclick="decryptText()">
+              <i class="fas fa-unlock"></i> Decrypt
+            </button>
+            
+            <div class="form-group">
+              <label for="decrypt-output">Decrypted Output</label>
+              <div class="output-container">
+                <pre id="decrypt-output" class="output"></pre>
+                <button class="icon-button copy-btn" onclick="copyToClipboard('decrypt-output')" title="Copy to clipboard">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="file-section" class="tab-content">
+      <div class="card-container">
+        <!-- FILE ENCRYPTION -->
+        <section class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-file-lock"></i> File Encryption</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="file-mode">Encryption Mode</label>
+              <select id="file-mode" class="form-control">
+                <option value="CBC">CBC (Recommended)</option>
+                <option value="CFB">CFB</option>
+                <option value="ECB">ECB (Not Recommended)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-key-size">Key Size</label>
+              <select id="file-key-size" class="form-control">
+                <option value="256">256-bit (Strongest)</option>
+                <option value="192">192-bit</option>
+                <option value="128">128-bit</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-key">Encryption Key (Hex)</label>
+              <div class="input-with-button">
+                <input id="file-key" class="form-control" placeholder="Enter or generate key" />
+                <button class="icon-button" onclick="copyToClipboard('file-key')" title="Copy key">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-iv">Initialization Vector (IV)</label>
+              <div class="input-with-button">
+                <input id="file-iv" class="form-control" placeholder="Enter or generate IV" />
+                <button class="icon-button" onclick="copyToClipboard('file-iv')" title="Copy IV">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="generateKeyIv('file')">
+              <i class="fas fa-key"></i> Generate New Key & IV
+            </button>
+            
+            <div class="form-group">
+              <label for="file-input" class="file-input-label">
+                <div class="file-drop-area" id="file-drop-area">
+                  <i class="fas fa-file-upload"></i>
+                  <span id="file-name-display">Choose a file or drag it here</span>
+                  <input id="file-input" type="file" class="file-input" />
+                </div>
+              </label>
+            </div>
+            
+            <button class="btn btn-primary" onclick="encryptFile()" id="encrypt-file-btn">
+              <i class="fas fa-lock"></i> <span>Encrypt & Download</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- FILE DECRYPTION -->
+        <section class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-file-unlock"></i> File Decryption</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group">
+              <label for="file-mode-dec">Decryption Mode</label>
+              <select id="file-mode-dec" class="form-control">
+                <option value="CBC">CBC (Recommended)</option>
+                <option value="CFB">CFB</option>
+                <option value="ECB">ECB (Not Recommended)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-dec-key-size">Key Size</label>
+              <select id="file-dec-key-size" class="form-control">
+                <option value="256">256-bit (Strongest)</option>
+                <option value="192">192-bit</option>
+                <option value="128">128-bit</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-dec-key">Decryption Key (Hex)</label>
+              <div class="input-with-button">
+                <input id="file-dec-key" class="form-control" placeholder="Enter or generate key" />
+                <button class="icon-button" onclick="copyToClipboard('file-dec-key')" title="Copy key">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="file-dec-iv">Initialization Vector (IV)</label>
+              <div class="input-with-button">
+                <input id="file-dec-iv" class="form-control" placeholder="Enter or generate IV" />
+                <button class="icon-button" onclick="copyToClipboard('file-dec-iv')" title="Copy IV">
+                  <i class="fas fa-copy"></i>
+                </button>
+              </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="generateKeyIv('file-dec')">
+              <i class="fas fa-key"></i> Generate New Key & IV
+            </button>
+            
+            <div class="form-group">
+              <label for="file-input-dec" class="file-input-label">
+                <div class="file-drop-area" id="file-drop-area-dec">
+                  <i class="fas fa-file-upload"></i>
+                  <span id="file-name-display-dec">Choose a file or drag it here</span>
+                  <input id="file-input-dec" type="file" class="file-input" />
+                </div>
+              </label>
+            </div>
+            
+            <button class="btn btn-primary" onclick="decryptFile()" id="decrypt-file-btn">
+              <i class="fas fa-unlock"></i> <span>Decrypt & Download</span>
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2025 HexGuard - Secure your data with confidence</p>
+    <div class="security-tips-toggle">
+      <button id="show-tips" class="link-button"><i class="fas fa-lightbulb"></i> Security Tips</button>
+    </div>
+  </footer>
+
+  <div id="security-tips-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-shield-alt"></i> Security Tips</h3>
+        <button id="close-tips" class="close-button">&times;</button>
+      </div>
+      <div class="modal-body">
+        <ul class="tips-list">
+          <li><strong>Key Management:</strong> Store your encryption keys securely and separately from encrypted data.</li>
+          <li><strong>Mode Selection:</strong> CBC and CFB are more secure than ECB mode which doesn't hide data patterns well.</li>
+          <li><strong>Key Size:</strong> Larger key sizes (256-bit) offer stronger security but may be slower.</li>
+          <li><strong>IV Importance:</strong> Always use a unique IV for each encryption with CBC/CFB modes.</li>
+          <li><strong>Secure Channel:</strong> This tool performs encryption in your browser, but transmit encrypted data through secure channels.</li>
+        </ul>
+      </div>
+    </div>
   </div>
-  
 
-  <script>
-    async function generateKeyIv(prefix) {
-      try {
-        const sizeDropdown = document.getElementById(`${prefix}-key-size`);
-        const bits = sizeDropdown ? parseInt(sizeDropdown.value) : 128;
-
-        const [keyRes, ivRes] = await Promise.all([
-          fetch(`/generate-key?bits=${bits}`),
-          fetch('/generate-iv')
-        ]);
-
-        const keyData = await keyRes.json();
-        const ivData = await ivRes.json();
-
-        document.getElementById(`${prefix}-key`).value = keyData.key;
-        document.getElementById(`${prefix}-iv`).value = ivData.iv;
-      } catch (err) {
-        alert("Failed to generate key or IV from backend.");
-      }
-    }
-
-    async function encryptText() {
-      const res = await fetch('/encrypt', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mode: document.getElementById('text-mode').value,
-          key: document.getElementById('text-key').value,
-          iv: document.getElementById('text-iv').value,
-          text: document.getElementById('text-input').value
-        })
-      });
-
-      const data = await res.json();
-      document.getElementById('encrypt-output').innerText = data.ciphertext || data.error;
-    }
-
-    async function decryptText() {
-        const mode = document.getElementById('text-mode-dec').value;
-        const key = document.getElementById('text-dec-key').value;
-        const iv = document.getElementById('text-dec-iv').value;
-        const ciphertext = document.getElementById('text-input-dec').value;
-
-        const res = await fetch('/decrypt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-            mode,
-            key,
-            iv,
-            text: ciphertext
-            })
-        });
-
-        const data = await res.json();
-        document.getElementById('decrypt-output').innerText = data.plaintext || data.error;
-}
-
-    async function encryptFile() {
-      const formData = new FormData();
-      formData.append('mode', document.getElementById('file-mode').value);
-      formData.append('key', document.getElementById('file-key').value);
-      formData.append('iv', document.getElementById('file-iv').value);
-      formData.append('file', document.getElementById('file-input').files[0]);
-      
-      console.log("[encryptFile] Triggered");
-
-      const key = document.getElementById('file-key').value;
-      const iv = document.getElementById('file-iv').value;    
-      console.log("[encryptFile] Sending key:", key);
-      console.log("[encryptFile] Sending iv:", iv);
-
-      const res = await fetch('/encrypt-file', { method: 'POST', body: formData });
-
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'encrypted_output.enc';
-
-        if (!window.encryptionDownloadTriggered) {
-            window.encryptionDownloadTriggered = true;
-            a.click();
-            setTimeout(() => window.encryptionDownloadTriggered = false, 3000);
-        }           
-      } else alert('File encryption failed.');
-    }
-
-    async function decryptFile() {
-        const formData = new FormData();
-        formData.append('mode', document.getElementById('file-mode-dec').value);
-        formData.append('key', document.getElementById('file-dec-key').value);
-        formData.append('iv', document.getElementById('file-dec-iv').value);
-        formData.append('file', document.getElementById('file-input-dec').files[0]);
-        console.log("[decryptFile] Decrypting now...");
-        const res = await fetch('/decrypt-file', { method: 'POST', body: formData });
-
-        if (res.ok) {
-            const blob = await res.blob();
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'decrypted_output.txt';
-            a.click();
-        } 
-        else {
-            alert('File decryption failed.');
-        }
-}
-
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
