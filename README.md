@@ -4,65 +4,113 @@
 HexGuard is an **AES encryption library** implemented in **C**. This project is part of my **13th grade final project** for the academic year **2024-2025**. The goal is to implement a robust AES encryption system while exploring advanced cryptographic techniques.
 
 ## Features
-- **AES Encryption & Decryption**:
-  - Supports **AES-128, AES-192, and AES-256** key sizes.
-  - Implements **ECB, CBC, and CFB** modes of operation.
-  - Uses **PKCS#7 padding** for encryption.
+- **AES Encryption & Decryption**
+  - Supports AES-128, AES-192, and AES-256 key sizes.
+  - Implements ECB, CBC, and CFB modes of operation.
+  - Uses **PKCS#7 padding**.
 
-- **Key & IV Management**:
-  - Generates random **AES keys**.
-  - Creates **initialization vectors (IVs)** for CBC and CFB modes.
+- **Key & IV Handling**
+  - Random **key generation** and **IV creation**.
+  - (Used an external lib didn't impliment my self the generation)
 
-- **File & Text Encryption**:
-  - Encrypts and decrypts **text strings**.
-  - Encrypts and decrypts **files** in binary mode.
-  - Performs **integrity checks** after decryption.
+- **Text & File Support**
+  - Encrypts/decrypts **text** and **files** (binary-safe).
 
-- **Testing Framework**:
-  - Includes **unit tests** for encryption and decryption.
+- **DLL & EXE Build Modes**
+  - Build as a **Windows DLL** or a **testable executable**.
+
+- **Python Frontend**
+  - Simple encryption GUI using HTML, CSS, JS.
+  - Powered by FastApi
+
+- **Testing Framework**
+  - Includes unit tests for encryption and decryption.
   - Validates correct key expansion and AES transformations.
+
+
+## Technologies Used
+- **C** – Core AES encryption implementation.
+- **Python** – Used for backend API and DLL interaction with FastAPI.
+- **HTML / CSS / JavaScript** – Simple web interface for user interaction.
+- **CMake** – Build system used to compile the AES code into a DLL or EXE.
+- **FastAPI** – Framework powering the Python backend.
+- **ctypes** – Used for calling C functions from Python.
+
 
 ---
 
 ## Installation & Setup
+
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/hexguard.git
+git clone https://github.com/Itapit/hexguard.git
 cd hexguard
 ```
 
-### 2. Build the Project Using CMake
-Ensure you have **CMake** installed:
+### 2. Set Up Python Environment (Frontend)
 ```bash
-cmake -B build
-cd build
-make
+cd backend
+python -m venv venv
+venv\Scripts\activate  # On Windows
+pip install fastapi uvicorn python-multipart
 ```
-This will generate the `test_aes` executable.
 
-### 3. Run Tests
+Then run:
 ```bash
-./bin/test_aes
+uvicorn backend.main:app --reload
 ```
-The test suite will verify encryption and decryption functionality.
+This serves the frontend at `http://127.0.0.1:8000`.
 
----
+### 3. Build C Components Using CMake
 
-## Usage
-> **Note:** As of now, the files and text used in encryption and decryption are hardcoded in the source code. This will be changed in the future.
+#### Option A: Build DLL (for integration)
+```bash
+cmake -S . -B build -DBUILD_DLL=ON
+cmake --build build
+```
+Output: `build/bin/Debug/aes.dll`
+
+#### Option B: Build and Run Tests
+```bash
+cmake -S . -B build -DBUILD_DLL=OFF
+cmake --build build
+./build/bin/Debug/test_aes.exe
+```
+Output: `build/bin/Debug/test_aes.exe`
 
 ---
 
 ## File Structure
 ```
+hexguard/
+├── backend/
+│   ├── api.py              # FastAPI routes
+│   ├── dll_wrapper.py      # Interface to AES DLL
+│   └── main.py             # FastAPI app runner
+│
+├── build/
+│   └── bin/
+│       └── Debug/
+│           ├── aes.dll        # DLL output
+│           └── test_aes.exe   # Executable with the unit testing
+│
+├── frontend/
+│   ├── index.html          # UI layout
+│   ├── script.js           # Frontend logic
+│   └── style.css           # UI styling
+│
 ├── include/
-│   ├── aes.h        # AES function declarations
+│   └── aes.h               # AES header file
+│
 ├── lib/
-│   ├── aes.c        # AES implementation
+│   └── aes.c               # AES C implementation
+│
 ├── tests/
-│   ├── test_aes.c   # Test cases for AES functions
-├── CMakeLists.txt   # CMake build configuration
-├── README.md        # Project documentation
+│   └── test_aes.c          # Unit tests
+│
+├── CMakeLists.txt
+│
+└── README.md
 ```
 
 ---
@@ -77,5 +125,4 @@ The test suite will verify encryption and decryption functionality.
 ---
 
 ## Contact
-For any questions or contributions, feel free to reach out!
-
+For questions or contributions, reach out at ItamarDavid90@gmail.com.
