@@ -10,4 +10,14 @@ __pycache__/
 
 ./documentation
 
-./tests
+tests/**
+
+# Ignore everything in build by default
+build/**
+
+# Allow folder structure down to the DLL and EXE
+!build/
+!build/bin/
+!build/bin/Debug/
+!build/bin/Debug/aes.dll
+!build/bin/Debug/test_aes.exe

@@ -1,6 +1,6 @@
 #ifndef AES_H
 #define AES_H
-#define BUILDING_AES_DLL // remove later
+
 #pragma region ---------- PreProcessor and typedef ----------
 #include <stdint.h>
 
