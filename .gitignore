@@ -1,4 +1,13 @@
-output.exe
-encrypted.txt
-hello.txt
-hello2.txt
+# Python
+__pycache__/
+*.pyc
+
+# Virtual Environment
+.venv/
+
+# VSCode settings (optional)
+.vscode/
+
+./documentation
+
+./tests
